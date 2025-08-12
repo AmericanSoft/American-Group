@@ -7,22 +7,8 @@ import "swiper/css";
 import "swiper/css/navigation";
 
 const STRINGS = {
-  ar: {
-    title: "اعرف اكتر عن خدماتنا",
-    placeholder: "ابحث عن جهازك",
-    btn: "احجز صيانة الآن",
-    empty: "لا توجد نتائج مطابقة.",
-    dir: "rtl",
-    fontDirPad: { pr: 0, pl: 0 },
-  },
-  en: {
-    title: "Learn more about our services",
-    placeholder: "Search your device",
-    btn: "Book Service Now",
-    empty: "No matching results.",
-    dir: "ltr",
-    fontDirPad: { pr: 0, pl: 0 },
-  },
+  ar: { title: "اعرف اكتر عن خدماتنا", placeholder: "ابحث عن جهازك", btn: "احجز صيانة الآن", empty: "لا توجد نتائج مطابقة.", dir: "rtl" },
+  en: { title: "Learn more about our services", placeholder: "Search your device", btn: "Book Service Now", empty: "No matching results.", dir: "ltr" },
 };
 
 const normalize = (s) =>
@@ -41,14 +27,8 @@ const fetchWithTimeout = async (url, ms = 6000) => {
   try {
     const res = await fetch(url, { cache: "no-cache", signal: controller.signal });
     if (!res.ok) throw new Error("HTTP " + res.status);
-    try {
-      return await res.json();
-    } catch {
-      return JSON.parse(await res.text());
-    }
-  } finally {
-    clearTimeout(t);
-  }
+    try { return await res.json(); } catch { return JSON.parse(await res.text()); }
+  } finally { clearTimeout(t); }
 };
 
 export default function BrandsSlider({
@@ -60,8 +40,7 @@ export default function BrandsSlider({
   btnAr = STRINGS.ar.btn,
   btnEn = STRINGS.en.btn,
   ph = "https://americangroup-eg.com/wp-content/uploads/placeholder.png",
-  lang: forcedLang, // "ar" | "en" | undefined
-  // سلوك السوايبر:
+  lang: forcedLang,
   autoplayDelay = 3500,
   speed = 600,
 }) {
@@ -77,7 +56,6 @@ export default function BrandsSlider({
   const nextRef = useRef(null);
   const prevRef = useRef(null);
 
-  // تحميل JSON + تخزين محلي
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -85,29 +63,19 @@ export default function BrandsSlider({
       const ver = "v1";
       const key = "brands_json_" + ver + "_" + btoa(json);
       let data = null;
-      try {
-        const cached = localStorage.getItem(key);
-        if (cached) data = JSON.parse(cached);
-      } catch {}
-
+      try { const cached = localStorage.getItem(key); if (cached) data = JSON.parse(cached); } catch {}
       try {
         if (!data) {
           data = await fetchWithTimeout(json, 6000);
-          try {
-            localStorage.setItem(key, JSON.stringify(data));
-          } catch {}
+          try { localStorage.setItem(key, JSON.stringify(data)); } catch {}
         }
         if (mounted) setBrands(Array.isArray(data) ? data : []);
       } catch (e) {
         if (mounted) setBrands([]);
         console.error("Brands JSON load failed:", e);
-      } finally {
-        if (mounted) setLoading(false);
-      }
+      } finally { if (mounted) setLoading(false); }
     })();
-    return () => {
-      mounted = false;
-    };
+    return () => { mounted = false; };
   }, [json]);
 
   const filtered = useMemo(() => {
@@ -119,7 +87,11 @@ export default function BrandsSlider({
     });
   }, [brands, q]);
 
-  // عناصر البطاقة
+  // أكبر slidesPerView = 4 → فعّل الـloop فقط لو عدد السلايدز أكبر من 4
+  const slidesCount = filtered?.length || 0;
+  const canLoop = slidesCount > 4;
+
+  // الكارت باستايلك القديم تمامًا
   const Card = ({ b }) => (
     <Box
       position="relative"
@@ -215,15 +187,7 @@ export default function BrandsSlider({
         {/* العنوان */}
         <VStack spacing={4} mb={6}>
           <Box w="72px" h="6px" borderRadius="6px" bg="#0B63FF" />
-          <Heading
-            as="h2"
-            m={0}
-            fontWeight="800"
-            fontSize={{ base: "32px", md: "48px" }}
-            letterSpacing="-0.02em"
-            color="#0E0E0E"
-            textAlign="center"
-          >
+          <Heading as="h2" m={0} fontWeight="800" fontSize={{ base: "32px", md: "48px" }} letterSpacing="-0.02em" color="#0E0E0E" textAlign="center">
             {lang === "ar" ? titleAr : titleEn}
           </Heading>
         </VStack>
@@ -247,65 +211,28 @@ export default function BrandsSlider({
 
         {/* أزرار السابق/التالي */}
         <HStack gap="10px" mb="3" justify={{ base: "center", md: "flex-start" }}>
-          <Button
-            ref={prevRef}
-            className="nav-btn prev"
-            w="42px"
-            h="42px"
-            borderRadius="12px"
-            border="1px solid #E3E6EF"
-            bg="#fff"
-            boxShadow="0 6px 14px rgba(0,0,0,.06)"
-            fontSize="22px"
-            lineHeight="1"
-            color="#1b1b1b"
-            _hover={{ bg: "#F7FAFF", transform: "translateY(-1px)", boxShadow: "0 10px 20px rgba(0,0,0,.09)" }}
-          >
+          <Button ref={prevRef} w="42px" h="42px" borderRadius="12px" border="1px solid #E3E6EF" bg="#fff" boxShadow="0 6px 14px rgba(0,0,0,.06)" fontSize="22px" lineHeight="1" color="#1b1b1b" _hover={{ bg: "#F7FAFF", transform: "translateY(-1px)", boxShadow: "0 10px 20px rgba(0,0,0,.09)" }}>
             {L.dir === "rtl" ? "›" : "‹"}
           </Button>
-          <Button
-            ref={nextRef}
-            className="nav-btn next"
-            w="42px"
-            h="42px"
-            borderRadius="12px"
-            border="1px solid #E3E6EF"
-            bg="#fff"
-            boxShadow="0 6px 14px rgba(0,0,0,.06)"
-            fontSize="22px"
-            lineHeight="1"
-            color="#1b1b1b"
-            _hover={{ bg: "#F7FAFF", transform: "translateY(-1px)", boxShadow: "0 10px 20px rgba(0,0,0,.09)" }}
-          >
+          <Button ref={nextRef} w="42px" h="42px" borderRadius="12px" border="1px solid #E3E6EF" bg="#fff" boxShadow="0 6px 14px rgba(0,0,0,.06)" fontSize="22px" lineHeight="1" color="#1b1b1b" _hover={{ bg: "#F7FAFF", transform: "translateY(-1px)", boxShadow: "0 10px 20px rgba(0,0,0,.09)" }}>
             {L.dir === "rtl" ? "‹" : "›"}
           </Button>
         </HStack>
 
         {/* السلايدر */}
-<Box
-  as="section"
-  dir={L.dir}
-  py={{ base: 12, md: 16 }}
-  px={4}
-    bgImage={[
-    "radial-gradient(900px 900px at 0% 10%, rgba(11,99,255,0.05) 1px, transparent 2px), radial-gradient(900px 900px at 120% 40%, rgba(11,99,255,0.05) 1px, transparent 2px)",
-  ]}
-  bgSize="120px 120px, 140px 140px"
->
-
+        <Box>
           <Swiper
+            key={`${canLoop}-${slidesCount}`}
             modules={[Autoplay, Navigation]}
             slidesPerView={1}
             spaceBetween={20}
-            loop
+            loop={canLoop}
             speed={speed}
-            autoplay={{ delay: autoplayDelay, disableOnInteraction: false, pauseOnMouseEnter: true }}
-            navigation={{
-              prevEl: prevRef.current,
-              nextEl: nextRef.current,
-            }}
+            autoplay={canLoop ? { delay: autoplayDelay, disableOnInteraction: false, pauseOnMouseEnter: true } : false}
+            slidesPerGroup={1}
+            allowTouchMove={slidesCount > 1}
+            navigation={{ prevEl: prevRef.current, nextEl: nextRef.current }}
             onBeforeInit={(swiper) => {
-              // توصيل الأزرار بعد ما تتكوّن الـ refs
               swiper.params.navigation.prevEl = prevRef.current;
               swiper.params.navigation.nextEl = nextRef.current;
             }}
@@ -318,25 +245,25 @@ export default function BrandsSlider({
           >
             {loading ? (
               Array.from({ length: 4 }).map((_, i) => (
-                <SwiperSlide key={"skeleton-" + i}>
-                  <Box
-                    h="360px"
-                    borderRadius="22px"
-                    border="1px solid #E7E9F2"
-                    bg="#fff"
-                    boxShadow="0 16px 32px rgba(0,0,0,.08)"
-                  />
+                <SwiperSlide key={`skeleton-${i}`}>
+                  {/* ➊ فراغ علوي داخل السلايد نفسه علشان الدائرة تبان كاملة */}
+                  <Box pt="78px">
+                    <Box h="360px" borderRadius="22px" border="1px solid #E7E9F2" bg="#fff" boxShadow="0 16px 32px rgba(0,0,0,.08)" />
+                  </Box>
                 </SwiperSlide>
               ))
             ) : filtered?.length ? (
               filtered.map((b, idx) => (
-                <SwiperSlide key={b?.id || b?.name || idx}>
-                  <Card b={b} />
+                <SwiperSlide key={`brand-${idx}-${b?.id ?? b?.slug ?? b?.en ?? b?.name ?? "x"}`}>
+                  {/* ➋ نفس الفكرة: ندي السلايد نفسه paddingTop بدل ما نغيّر overflow */}
+                  <Box pt="78px">
+                    <Card b={b} />
+                  </Box>
                 </SwiperSlide>
               ))
             ) : (
-              <SwiperSlide>
-                <Box textAlign="center" color="gray.600" py={10}>
+              <SwiperSlide key="empty">
+                <Box pt="78px" textAlign="center" color="gray.600" py={10}>
                   {L.empty}
                 </Box>
               </SwiperSlide>
