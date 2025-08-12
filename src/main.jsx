@@ -2,6 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import { BrowserRouter } from "react-router-dom";
+import RequestModalProvider from "./contexts/RequestModalContext";
 import App from "./App/App.jsx";
 import "./index.css";
 import "./i18n.js";
@@ -9,7 +10,7 @@ import "./i18n.js";
 const theme = extendTheme({
   initialColorMode: "light",
   useSystemColorMode: false,
-    fonts: {
+  fonts: {
     heading: `'Cairo', sans-serif`,
     body: `'Cairo', sans-serif`,
   },
@@ -19,7 +20,9 @@ createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>
       <ChakraProvider theme={theme}>
-        <App />
+        <RequestModalProvider>
+          <App />
+        </RequestModalProvider>
       </ChakraProvider>
     </BrowserRouter>
   </StrictMode>

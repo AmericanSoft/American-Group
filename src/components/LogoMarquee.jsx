@@ -4,12 +4,12 @@ import { Box, HStack, Image, Link, usePrefersReducedMotion } from "@chakra-ui/re
 
 // لوجوهات افتراضية — بدّل زي ما تحب
 const DEFAULT_LOGOS = [
-  { src: "https://americangroup-eg.com/wp-content/uploads/2025/08/samsung.png", alt: "Samsung" },
-  { src: "https://americangroup-eg.com/wp-content/uploads/2025/08/Chiller-Egypt.png", alt: "Chiller Egypt" },
-  { src: "https://americangroup-eg.com/wp-content/uploads/2025/08/toshiba.png", alt: "Toshiba" },
-  { src: "https://americangroup-eg.com/wp-content/uploads/2025/08/LG.png", alt: "LG" },
-  { src: "https://americangroup-eg.com/wp-content/uploads/2025/08/miele.png", alt: "Miele" },
-  { src: "https://americangroup-eg.com/wp-content/uploads/2025/08/Westinghouse.png", alt: "Westinghouse" },
+  { src: "/assets/samsung.webp", alt: "Samsung" },
+  { src: "/assets/Chiller-Egypt.png", alt: "Chiller Egypt" },
+  { src: "/assets/toshiba.png", alt: "Toshiba" },
+  { src: "/assets/LG.webp", alt: "LG" },
+  { src: "/assets/miele.webp", alt: "Miele" },
+  { src: "/assets/Westinghouse.webp", alt: "Westinghouse" },
 ];
 
 export default function LogoMarquee({

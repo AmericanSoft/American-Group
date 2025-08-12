@@ -5,10 +5,23 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
+import { useRequestModal } from "../contexts/RequestModalContext";
 
 const STRINGS = {
-  ar: { title: "اعرف اكتر عن خدماتنا", placeholder: "ابحث عن جهازك", btn: "احجز صيانة الآن", empty: "لا توجد نتائج مطابقة.", dir: "rtl" },
-  en: { title: "Learn more about our services", placeholder: "Search your device", btn: "Book Service Now", empty: "No matching results.", dir: "ltr" },
+  ar: {
+    title: "اعرف اكتر عن خدماتنا",
+    placeholder: "ابحث عن جهازك",
+    btn: "احجز صيانة الآن",
+    empty: "لا توجد نتائج مطابقة.",
+    dir: "rtl",
+  },
+  en: {
+    title: "Learn more about our services",
+    placeholder: "Search your device",
+    btn: "Book Service Now",
+    empty: "No matching results.",
+    dir: "ltr",
+  },
 };
 
 const normalize = (s) =>
@@ -55,6 +68,7 @@ export default function BrandsSlider({
 
   const nextRef = useRef(null);
   const prevRef = useRef(null);
+  const { open } = useRequestModal();
 
   useEffect(() => {
     let mounted = true;
@@ -63,7 +77,10 @@ export default function BrandsSlider({
       const ver = "v1";
       const key = "brands_json_" + ver + "_" + btoa(json);
       let data = null;
-      try { const cached = localStorage.getItem(key); if (cached) data = JSON.parse(cached); } catch {}
+      try {
+        const cached = localStorage.getItem(key);
+        if (cached) data = JSON.parse(cached);
+      } catch {}
       try {
         if (!data) {
           data = await fetchWithTimeout(json, 6000);
@@ -166,6 +183,7 @@ export default function BrandsSlider({
         fontSize="16px"
         borderRadius="12px"
         boxShadow="0 12px 26px rgba(11,99,255,.25)"
+        onClick={() => open({ brand: b?.name, device: "" })}
       >
         {lang === "ar" ? btnAr : btnEn}
       </Button>
@@ -211,10 +229,34 @@ export default function BrandsSlider({
 
         {/* أزرار السابق/التالي */}
         <HStack gap="10px" mb="3" justify={{ base: "center", md: "flex-start" }}>
-          <Button ref={prevRef} w="42px" h="42px" borderRadius="12px" border="1px solid #E3E6EF" bg="#fff" boxShadow="0 6px 14px rgba(0,0,0,.06)" fontSize="22px" lineHeight="1" color="#1b1b1b" _hover={{ bg: "#F7FAFF", transform: "translateY(-1px)", boxShadow: "0 10px 20px rgba(0,0,0,.09)" }}>
+          <Button
+            ref={prevRef}
+            w="42px"
+            h="42px"
+            borderRadius="12px"
+            border="1px solid #E3E6EF"
+            bg="#fff"
+            boxShadow="0 6px 14px rgba(0,0,0,.06)"
+            fontSize="22px"
+            lineHeight="1"
+            color="#1b1b1b"
+            _hover={{ bg: "#F7FAFF", transform: "translateY(-1px)", boxShadow: "0 10px 20px rgba(0,0,0,.09)" }}
+          >
             {L.dir === "rtl" ? "›" : "‹"}
           </Button>
-          <Button ref={nextRef} w="42px" h="42px" borderRadius="12px" border="1px solid #E3E6EF" bg="#fff" boxShadow="0 6px 14px rgba(0,0,0,.06)" fontSize="22px" lineHeight="1" color="#1b1b1b" _hover={{ bg: "#F7FAFF", transform: "translateY(-1px)", boxShadow: "0 10px 20px rgba(0,0,0,.09)" }}>
+          <Button
+            ref={nextRef}
+            w="42px"
+            h="42px"
+            borderRadius="12px"
+            border="1px solid #E3E6EF"
+            bg="#fff"
+            boxShadow="0 6px 14px rgba(0,0,0,.06)"
+            fontSize="22px"
+            lineHeight="1"
+            color="#1b1b1b"
+            _hover={{ bg: "#F7FAFF", transform: "translateY(-1px)", boxShadow: "0 10px 20px rgba(0,0,0,.09)" }}
+          >
             {L.dir === "rtl" ? "‹" : "›"}
           </Button>
         </HStack>
@@ -248,7 +290,13 @@ export default function BrandsSlider({
                 <SwiperSlide key={`skeleton-${i}`}>
                   {/* ➊ فراغ علوي داخل السلايد نفسه علشان الدائرة تبان كاملة */}
                   <Box pt="78px">
-                    <Box h="360px" borderRadius="22px" border="1px solid #E7E9F2" bg="#fff" boxShadow="0 16px 32px rgba(0,0,0,.08)" />
+                    <Box
+                      h="360px"
+                      borderRadius="22px"
+                      border="1px solid #E7E9F2"
+                      bg="#fff"
+                      boxShadow="0 16px 32px rgba(0,0,0,.08)"
+                    />
                   </Box>
                 </SwiperSlide>
               ))
