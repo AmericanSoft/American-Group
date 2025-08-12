@@ -14,7 +14,6 @@ const STRINGS = {
     btn: "احجز صيانة الآن",
     empty: "لا توجد نتائج مطابقة.",
     dir: "rtl",
-    fontDirPad: { pr: 0, pl: 0 },
   },
   en: {
     title: "Learn more about our services",
@@ -22,7 +21,6 @@ const STRINGS = {
     btn: "Book Service Now",
     empty: "No matching results.",
     dir: "ltr",
-    fontDirPad: { pr: 0, pl: 0 },
   },
 };
 
@@ -61,8 +59,7 @@ export default function BrandsSlider({
   btnAr = STRINGS.ar.btn,
   btnEn = STRINGS.en.btn,
   ph = "https://americangroup-eg.com/wp-content/uploads/placeholder.png",
-  lang: forcedLang, // "ar" | "en" | undefined
-  // سلوك السوايبر:
+  lang: forcedLang,
   autoplayDelay = 3500,
   speed = 600,
 }) {
@@ -79,7 +76,6 @@ export default function BrandsSlider({
   const prevRef = useRef(null);
   const { open } = useRequestModal();
 
-  // تحميل JSON + تخزين محلي
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -91,7 +87,6 @@ export default function BrandsSlider({
         const cached = localStorage.getItem(key);
         if (cached) data = JSON.parse(cached);
       } catch {}
-
       try {
         if (!data) {
           data = await fetchWithTimeout(json, 6000);
@@ -121,7 +116,11 @@ export default function BrandsSlider({
     });
   }, [brands, q]);
 
-  // عناصر البطاقة
+  // أكبر slidesPerView = 4 → فعّل الـloop فقط لو عدد السلايدز أكبر من 4
+  const slidesCount = filtered?.length || 0;
+  const canLoop = slidesCount > 4;
+
+  // الكارت باستايلك القديم تمامًا
   const Card = ({ b }) => (
     <Box
       position="relative"
@@ -196,7 +195,7 @@ export default function BrandsSlider({
         fontSize="16px"
         borderRadius="12px"
         boxShadow="0 12px 26px rgba(11,99,255,.25)"
-        onClick={() => open({ brand: b?.name, device: "" })}
+        onClick={() => open({ brand: b?.name, device: "" })}
       >
         {lang === "ar" ? btnAr : btnEn}
       </Button>
@@ -252,7 +251,6 @@ export default function BrandsSlider({
         <HStack gap="10px" mb="3" justify={{ base: "center", md: "flex-start" }}>
           <Button
             ref={prevRef}
-            className="nav-btn prev"
             w="42px"
             h="42px"
             borderRadius="12px"
@@ -268,7 +266,6 @@ export default function BrandsSlider({
           </Button>
           <Button
             ref={nextRef}
-            className="nav-btn next"
             w="42px"
             h="42px"
             borderRadius="12px"
@@ -285,30 +282,19 @@ export default function BrandsSlider({
         </HStack>
 
         {/* السلايدر */}
-<Box
-  as="section"
-  dir={L.dir}
-  py={{ base: 12, md: 16 }}
-  px={4}
-    bgImage={[
-    "radial-gradient(900px 900px at 0% 10%, rgba(11,99,255,0.05) 1px, transparent 2px), radial-gradient(900px 900px at 120% 40%, rgba(11,99,255,0.05) 1px, transparent 2px)",
-  ]}
-  bgSize="120px 120px, 140px 140px"
->
-
+        <Box>
           <Swiper
+            key={`${canLoop}-${slidesCount}`}
             modules={[Autoplay, Navigation]}
             slidesPerView={1}
             spaceBetween={20}
-            loop
+            loop={canLoop}
             speed={speed}
-            autoplay={{ delay: autoplayDelay, disableOnInteraction: false, pauseOnMouseEnter: true }}
-            navigation={{
-              prevEl: prevRef.current,
-              nextEl: nextRef.current,
-            }}
+            autoplay={canLoop ? { delay: autoplayDelay, disableOnInteraction: false, pauseOnMouseEnter: true } : false}
+            slidesPerGroup={1}
+            allowTouchMove={slidesCount > 1}
+            navigation={{ prevEl: prevRef.current, nextEl: nextRef.current }}
             onBeforeInit={(swiper) => {
-              // توصيل الأزرار بعد ما تتكوّن الـ refs
               swiper.params.navigation.prevEl = prevRef.current;
               swiper.params.navigation.nextEl = nextRef.current;
             }}
@@ -321,25 +307,31 @@ export default function BrandsSlider({
           >
             {loading ? (
               Array.from({ length: 4 }).map((_, i) => (
-                <SwiperSlide key={"skeleton-" + i}>
-                  <Box
-                    h="360px"
-                    borderRadius="22px"
-                    border="1px solid #E7E9F2"
-                    bg="#fff"
-                    boxShadow="0 16px 32px rgba(0,0,0,.08)"
-                  />
+                <SwiperSlide key={`skeleton-${i}`}>
+                  {/* ➊ فراغ علوي داخل السلايد نفسه علشان الدائرة تبان كاملة */}
+                  <Box pt="78px">
+                    <Box
+                      h="360px"
+                      borderRadius="22px"
+                      border="1px solid #E7E9F2"
+                      bg="#fff"
+                      boxShadow="0 16px 32px rgba(0,0,0,.08)"
+                    />
+                  </Box>
                 </SwiperSlide>
               ))
             ) : filtered?.length ? (
               filtered.map((b, idx) => (
-                <SwiperSlide key={b?.id || b?.name || idx}>
-                  <Card b={b} />
+                <SwiperSlide key={`brand-${idx}-${b?.id ?? b?.slug ?? b?.en ?? b?.name ?? "x"}`}>
+                  {/* ➋ نفس الفكرة: ندي السلايد نفسه paddingTop بدل ما نغيّر overflow */}
+                  <Box pt="78px">
+                    <Card b={b} />
+                  </Box>
                 </SwiperSlide>
               ))
             ) : (
-              <SwiperSlide>
-                <Box textAlign="center" color="gray.600" py={10}>
+              <SwiperSlide key="empty">
+                <Box pt="78px" textAlign="center" color="gray.600" py={10}>
                   {L.empty}
                 </Box>
               </SwiperSlide>
