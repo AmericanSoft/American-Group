@@ -1,6 +1,7 @@
 import { Box, Container, HStack, VStack, Button, Text, Badge } from "@chakra-ui/react";
 import { SearchIcon, StarIcon } from "@chakra-ui/icons";
 import { useLocation } from "react-router-dom";
+import { useRequestModal } from "../contexts/RequestModalContext";
 
 const STRINGS = {
   ar: {
@@ -26,6 +27,7 @@ export default function Hero({ lang: forcedLang }) {
   const isEnPath = pathname.startsWith("/en");
   const lang = forcedLang || (isEnPath ? "en" : "ar");
   const t = STRINGS[lang];
+  const { open } = useRequestModal();
 
   return (
     <Box
@@ -83,7 +85,7 @@ export default function Hero({ lang: forcedLang }) {
             {t.titleL2}
           </Text>
 
-          <Button colorScheme="blue" size="lg" borderRadius="xl" px={8} height="50px">
+          <Button colorScheme="blue" size="lg" borderRadius="xl" px={8} height="50px" onClick={() => open({})}>
             {t.cta}
           </Button>
         </VStack>

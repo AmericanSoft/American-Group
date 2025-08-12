@@ -5,6 +5,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
+import { useRequestModal } from "../contexts/RequestModalContext";
 
 const STRINGS = {
   ar: {
@@ -76,6 +77,7 @@ export default function BrandsSlider({
 
   const nextRef = useRef(null);
   const prevRef = useRef(null);
+  const { open } = useRequestModal();
 
   // تحميل JSON + تخزين محلي
   useEffect(() => {
@@ -194,6 +196,7 @@ export default function BrandsSlider({
         fontSize="16px"
         borderRadius="12px"
         boxShadow="0 12px 26px rgba(11,99,255,.25)"
+        onClick={() => open({ brand: b?.name, device: "" })}
       >
         {lang === "ar" ? btnAr : btnEn}
       </Button>
