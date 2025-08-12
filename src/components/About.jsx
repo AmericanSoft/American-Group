@@ -3,7 +3,8 @@ import {
   Box, Container, Grid, GridItem, Heading, Text, Button, Image, VStack
 } from "@chakra-ui/react";
 import { useLocation } from "react-router-dom";
-
+// ✅ استيراد الهوك لفتح المودال — عدّل المسار حسب مشروعك
+import { useRequestModal } from "../contexts/RequestModalContext"; // <-- عدّل المسار
 
 const aboutSrc = "/assets/About.png";
 const COPY = {
@@ -26,7 +27,7 @@ const COPY = {
 };
 
 export default function About({
-  lang: forcedLang,              // اختياري: "ar" | "en"
+  lang: forcedLang,
   image = aboutSrc,
   onCta = () => {},
 }) {
@@ -34,6 +35,9 @@ export default function About({
   const isEn = pathname.startsWith("/en");
   const lang = forcedLang || (isEn ? "en" : "ar");
   const t = COPY[lang];
+
+  // ✅ جيب دالة open من الكونتكست
+  const { open } = useRequestModal?.() || { open: () => {} };
 
   return (
     <Box
@@ -96,9 +100,14 @@ export default function About({
                 </Text>
               </Box>
 
+              {/* ✅ ضفت الكلاس — وخلّيت الزرار يفتح المودال + يستدعي onCta */}
               <Button
-                onClick={onCta}
-                alignSelf={{ base: "center", md: t.dir === "rtl" ? "flex-start" : "flex-start" }}
+                className="my-custom-class"
+                onClick={() => {
+                  try { onCta?.(); } catch {}
+                  open?.({ brand: "", device: "" }); // افتح المودال
+                }}
+                alignSelf={{ base: "center", md: "flex-start" }}
                 bg="#0b63ff"
                 _hover={{ bg: "#0a53d4" }}
                 color="white"

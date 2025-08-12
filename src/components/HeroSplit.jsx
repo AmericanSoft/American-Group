@@ -4,6 +4,8 @@ import {
   Box, Container, Grid, GridItem, Heading, Text, HStack, Button, Image
 } from "@chakra-ui/react";
 import { useLocation } from "react-router-dom";
+// 👇 عدّل المسار حسب مكان الملف عندك
+import { useRequestModal } from "../contexts/RequestModalContext";
 
 export default function HeroSplit({
   lang: forcedLang,                    // "ar" | "en" | undefined
@@ -12,9 +14,11 @@ export default function HeroSplit({
   secondaryHref = "#",
   onPrimary,
   onSecondary,
+  brandName = "",                      // ✅ جديدة: اسم البراند لو عايز تبعته للمودال
 }) {
   const { pathname } = useLocation();
   const isEn = (forcedLang || (pathname.startsWith("/en") ? "en" : "ar")) === "en";
+  const { open } = useRequestModal();  // ✅ هانستخدمها لفتح المودال
 
   const t = isEn
     ? {
@@ -53,30 +57,16 @@ export default function HeroSplit({
     <Box as="section" dir={t.dir} bg="white" py={{ base: 8, md: 12 }}>
       <Container maxW="6xl">
         <Grid
-          // دايمًا على الديسكتوب: شمال الكلام، يمين الصورة
-          templateAreas={{
-            base: `"text" "image"`,
-            md: `"text image"`,
-          }}
+          templateAreas={{ base: `"text" "image"`, md: `"text image"` }}
           templateColumns={{ base: "1fr", md: "1fr 1fr" }}
           gap={{ base: 8, md: 12 }}
           alignItems="center"
         >
-          {/* النص — شمال */}
+          {/* النص */}
           <GridItem area="text">
             <Box textAlign={t.textAlign}>
-              {/* الشُرطة الزرقا */}
-              <Box
-                as="span"
-                display="inline-block"
-                w="72px"
-                h="6px"
-                borderRadius="6px"
-                bg="#0B63FF"
-                mb={4}
-              />
+              <Box as="span" display="inline-block" w="72px" h="6px" borderRadius="6px" bg="#0B63FF" mb={4} />
 
-              {/* العنوان */}
               <Heading
                 as="h1"
                 lineHeight="1.22"
@@ -91,21 +81,21 @@ export default function HeroSplit({
                 {t.titleRest}
               </Heading>
 
-              {/* الوصف */}
               <Text color="#6B7180" fontSize="17px" lineHeight="32px" mb={6}>
                 {t.sub}
               </Text>
 
-              {/* الأزرار */}
-              <HStack
-                spacing={3}
-                justify={t.textAlign === "right" ? "flex-start" : "flex-start"}
-                flexWrap="wrap"
-              >
+              <HStack spacing={3} justify="flex-start" flexWrap="wrap">
+                {/* ✅ زرار الحجز — أضفت className وفتح المودال شغال */}
                 <Button
                   as="a"
                   href={primaryHref}
-                  onClick={onPrimary}
+                  onClick={(e) => {
+                    onPrimary?.(e);
+                    // افتح المودال مع البراند (لو مبعوت) + device فاضي
+                    open({ brand: brandName || "", device: "" });
+                  }}
+                  className="btn-main"
                   h="56px"
                   px="24px"
                   borderRadius="12px"
@@ -137,7 +127,7 @@ export default function HeroSplit({
             </Box>
           </GridItem>
 
-          {/* الصورة — يمين */}
+          {/* الصورة */}
           <GridItem area="image">
             <Box>
               <Image
