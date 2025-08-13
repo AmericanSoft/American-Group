@@ -10,7 +10,7 @@ export default function AppLayout() {
       <Header />
       <Outlet />
       <FooterTop />
-      <Footer />
+<Footer bgImage="/assets/Footer.png" logoSrc="/assets/my-logo.png" />
      </div>
   );
 }

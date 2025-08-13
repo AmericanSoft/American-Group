@@ -52,88 +52,105 @@ export default function About({
     >
       <Container maxW="6xl">
         {/* العنوان مع الشُرطة العلوية */}
-        <Box textAlign="center" mb={8} position="relative" display="inline-block">
-          <Heading
-            as="h2"
-            fontWeight="800"
-            fontSize={{ base: "28px", md: "44px" }}
-            color="gray.900"
-          >
-            {t.title}
-          </Heading>
-          <Box
-            position="absolute"
-            {...(t.dir === "rtl" ? { right: 0 } : { left: 0 })}
-            top="-10px"
-            w="64px"
-            h="6px"
-            bg="#0b63ff"
-            borderRadius="6px"
-          />
-        </Box>
+<Box 
+  textAlign={{ base: "center", md: "start" }}
+  mb={8}
+  position="relative"
+  display={{ base: "block", md: "inline-block"  }} // 📌 خليها block على الموبايل
+>
+  <Heading
+    as="h2"
+    fontWeight="800"
+    fontSize={{ base: "28px", md: "44px" }}
+    color="gray.900"
+    textAlign={{ base: "center", md: "start" }} // 📌 نفس الفكرة للعنوان
+  >
+    {t.title}
+  </Heading>
+  <Box
+    position="absolute"
+    {...(t.dir === "rtl" ? { right: 0 } : { left: 0 })}
+    top="-10px"
+    w="64px"
+    h="6px"
+    bg="#0b63ff"
+    borderRadius="6px"
+  />
+</Box>
+
 
         {/* الشبكة */}
-        <Grid
-          templateColumns={{ base: "1fr", md: "1.05fr 1fr" }}
-          alignItems="center"
-          gap={{ base: 7, md: 12 }}
-        >
-          <GridItem>
-            <VStack align="stretch" spacing={4}>
-              <Box position="relative" {...(t.dir === "rtl" ? { pr: { base: 0, md: 6 } } : { pl: { base: 0, md: 6 } })}>
-                {/* الشريط الجانبي الملون */}
-                <Box
-                  display={{ base: "none", md: "block" }}
-                  position="absolute"
-                  {...(t.dir === "rtl" ? { right: 0 } : { left: 0 })}
-                  top="6px"
-                  bottom="6px"
-                  w="6px"
-                  borderRadius="6px"
-                  bg="#0b63ff"
-                />
-                <Text color="gray.600" lineHeight="2" fontSize="18px" mb={2}>
-                  {t.p1}
-                </Text>
-                <Text color="gray.600" lineHeight="2" fontSize="18px">
-                  {t.p2}
-                </Text>
-              </Box>
+<Grid
+  templateColumns={{ base: "1fr", md: "1.05fr 1fr" }}
+  alignItems="center"
+  gap={{ base: 7, md: 6 }}
+>
+  {/* الصورة */}
+  <GridItem order={{ base: 1, md: 2 }}>
+    <Image
+      src={image}
+      alt={t.imgAlt}
+      w="100%"
+      maxH="520px"
+      objectFit="cover"
+      borderRadius="18px"
+      boxShadow="0 18px 40px rgba(0,0,0,0.12)"
+    />
+  </GridItem>
 
-              {/* ✅ ضفت الكلاس — وخلّيت الزرار يفتح المودال + يستدعي onCta */}
-              <Button
-                className="my-custom-class"
-                onClick={() => {
-                  try { onCta?.(); } catch {}
-                  open?.({ brand: "", device: "" }); // افتح المودال
-                }}
-                alignSelf={{ base: "center", md: "flex-start" }}
-                bg="#0b63ff"
-                _hover={{ bg: "#0a53d4" }}
-                color="white"
-                fontWeight="800"
-                px={5}
-                py={3}
-                borderRadius="12px"
-                boxShadow="0 10px 22px rgba(11,99,255,0.25)"
-              >
-                {t.cta}
-              </Button>
-            </VStack>
-          </GridItem>
+  {/* النص */}
+  <GridItem order={{ base: 2, md: 1 }}>
+    <VStack align="stretch" spacing={4}>
+      <Box
+        position="relative"
+        {...(t.dir === "rtl"
+          ? { pr: { base: 0, md: 6 } }
+          : { pl: { base: 0, md: 6 } })}
+      >
+        <Box
+          display={{ base: "none", md: "block" }}
+          position="absolute"
+          {...(t.dir === "rtl" ? { right: 0 } : { left: 0 })}
+          top="10px"
+          bottom="160px"
+          w="6px"
+          borderRadius="6px"
+          bg="#0b63ff"
+        />
+        <Text color="gray.600" lineHeight="2" fontSize="18px" mb={2}>
+          {t.p1}
+        </Text>
+        <Text color="gray.600" lineHeight="2" fontSize="18px">
+          {t.p2}
+        </Text>
+      </Box>
 
-          <GridItem>
-            <Image
-              src={image}
-              alt={t.imgAlt}
-              w="100%"
-              maxH="520px"
-              objectFit="cover"
-              borderRadius="18px"
-              boxShadow="0 18px 40px rgba(0,0,0,0.12)"
-            />
-          </GridItem>
-        </Grid>
+      <Button
+        className="my-custom-class"
+        onClick={() => {
+          try {
+            onCta?.();
+          } catch {}
+          open?.({ brand: "", device: "" });
+        }}
+        alignSelf={{ base: "center", md: "flex-start" }}
+        bg="#0b63ff"
+        _hover={{ bg: "#0a53d4" }}
+        color="white"
+        fontWeight="800"
+  fontSize="20px"       
+  px={8}               
+  py={8}             
+  borderRadius="14px"   
+
+        boxShadow="0 10px 22px rgba(11,99,255,0.25)"
+      >
+        {t.cta}
+      </Button>
+    </VStack>
+  </GridItem>
+</Grid>
+
       </Container>
     </Box>
   );

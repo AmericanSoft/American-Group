@@ -88,63 +88,74 @@ export default function RequestServiceModal({ isOpen, onClose, prefill = {} }) {
   return (
     <Modal isOpen={isOpen} onClose={loading ? () => {} : onClose} isCentered>
       <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>{t.title}</ModalHeader>
-        <ModalBody>
-          {/* Honeypot hidden field لمكافحة السبام */}
-          <Input name="hp" value={form.hp} onChange={onChange} display="none" />
+<ModalContent dir={isEn ? "ltr" : "rtl"}>
+  <ModalHeader textAlign={isEn ? "left" : "right"}>{t.title}</ModalHeader>
+  <ModalBody style={{ textAlign: isEn ? "left" : "right" }}>
+    {/* Honeypot hidden field */}
+    <Input name="hp" value={form.hp} onChange={onChange} display="none" />
 
-          <HStack spacing={4}>
-            <FormControl isRequired>
-              <FormLabel>{t.fields.name}</FormLabel>
-              <Input name="name" value={form.name} onChange={onChange} />
-            </FormControl>
-            <FormControl isRequired>
-              <FormLabel>{t.fields.phone}</FormLabel>
-              <Input name="phone" value={form.phone} onChange={onChange} />
-            </FormControl>
-          </HStack>
+    <HStack spacing={4} flexDir={isEn ? "row" : "row-reverse"}>
+      <FormControl isRequired>
+        <FormLabel>{t.fields.phone}</FormLabel>
+        <Input name="phone" value={form.phone} onChange={onChange} textAlign={isEn ? "left" : "right"} />
+      </FormControl>
+      <FormControl isRequired>
+        <FormLabel>{t.fields.name}</FormLabel>
+        <Input name="name" value={form.name} onChange={onChange} textAlign={isEn ? "left" : "right"} />
+      </FormControl>
+    </HStack>
 
-          <HStack spacing={4} mt={4}>
-            <FormControl>
-              <FormLabel>{t.fields.city}</FormLabel>
-              <Input name="city" value={form.city} onChange={onChange} />
-            </FormControl>
-            <FormControl>
-              <FormLabel>{t.fields.brand}</FormLabel>
-              <Input name="brand" value={form.brand} onChange={onChange} />
-            </FormControl>
-          </HStack>
+    <HStack spacing={4} mt={4} flexDir={isEn ? "row" : "row-reverse"}>
+      <FormControl>
+        <FormLabel>{t.fields.city}</FormLabel>
+        <Input name="city" value={form.city} onChange={onChange} textAlign={isEn ? "left" : "right"} />
+      </FormControl>
+      <FormControl>
+        <FormLabel>{t.fields.brand}</FormLabel>
+        <Input name="brand" value={form.brand} onChange={onChange} textAlign={isEn ? "left" : "right"} />
+      </FormControl>
+    </HStack>
 
-          <FormControl mt={4}>
-            <FormLabel>{t.fields.device}</FormLabel>
-            <Select name="device" value={form.device} onChange={onChange}>
-              <option value="">{isEn ? "Select…" : "اختر…"}</option>
-              <option value="Refrigerator">{isEn ? "Refrigerator" : "ثلاجة"}</option>
-              <option value="Washer">{isEn ? "Washing Machine" : "غسالة"}</option>
-              <option value="Oven">{isEn ? "Cooker/Oven" : "بوتاجاز/فرن"}</option>
-              <option value="Microwave">{isEn ? "Microwave" : "ميكروويف"}</option>
-              <option value="AC">{isEn ? "Air Conditioner" : "تكييف"}</option>
-              <option value="Heater">{isEn ? "Water Heater" : "سخان"}</option>
-              <option value="Freezer">{isEn ? "Deep Freezer" : "ديب فريزر"}</option>
-            </Select>
-          </FormControl>
+    <FormControl mt={4}>
+      <FormLabel>{t.fields.device}</FormLabel>
+      <Select
+        name="device"
+        value={form.device}
+        onChange={onChange}
+        textAlign={isEn ? "left" : "right"}
+      >
+        <option value="">{isEn ? "Select…" : "اختر…"}</option>
+        <option value="Refrigerator">{isEn ? "Refrigerator" : "ثلاجة"}</option>
+        <option value="Washer">{isEn ? "Washing Machine" : "غسالة"}</option>
+        <option value="Oven">{isEn ? "Cooker/Oven" : "بوتاجاز/فرن"}</option>
+        <option value="Microwave">{isEn ? "Microwave" : "ميكروويف"}</option>
+        <option value="AC">{isEn ? "Air Conditioner" : "تكييف"}</option>
+        <option value="Heater">{isEn ? "Water Heater" : "سخان"}</option>
+        <option value="Freezer">{isEn ? "Deep Freezer" : "ديب فريزر"}</option>
+      </Select>
+    </FormControl>
 
-          <FormControl mt={4}>
-            <FormLabel>{t.fields.issue}</FormLabel>
-            <Textarea name="issue" value={form.issue} onChange={onChange} rows={4} />
-          </FormControl>
-        </ModalBody>
+    <FormControl mt={4}>
+      <FormLabel>{t.fields.issue}</FormLabel>
+      <Textarea
+        name="issue"
+        value={form.issue}
+        onChange={onChange}
+        rows={4}
+        textAlign={isEn ? "left" : "right"}
+      />
+    </FormControl>
+  </ModalBody>
+  <ModalFooter>
+    <Button mr={3} variant="ghost" onClick={onClose} isDisabled={loading}>
+      {t.cancel}
+    </Button>
+    <Button colorScheme="blue" onClick={submit} isLoading={loading}>
+      {t.save}
+    </Button>
+  </ModalFooter>
+</ModalContent>
 
-        <ModalFooter>
-          <Button mr={3} variant="ghost" onClick={onClose} isDisabled={loading}>
-            {t.cancel}
-          </Button>
-          <Button colorScheme="blue" onClick={submit} isLoading={loading}>
-            {t.save}
-          </Button>
-        </ModalFooter>
-      </ModalContent>
     </Modal>
   );
 }

@@ -1,5 +1,16 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Box, Container, Heading, Input, Button, HStack, VStack, Text, Image } from "@chakra-ui/react";
+import {
+  Box,
+  Container,
+  Heading,
+  Input,
+  Button,
+  HStack,
+  VStack,
+  Text,
+  Image,
+  useBreakpointValue,          // ✅ علشان نعرف احنا موبايل ولا ديسكتوب
+} from "@chakra-ui/react";
 import { useLocation } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation } from "swiper/modules";
@@ -70,6 +81,9 @@ export default function BrandsSlider({
   const prevRef = useRef(null);
   const { open } = useRequestModal();
 
+  // ✅ true على الشاشات md فما فوق (ديسكتوب/تابلت كبير)، false على الموبايل
+  const isDesktop = useBreakpointValue({ base: false, md: true });
+
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -104,11 +118,9 @@ export default function BrandsSlider({
     });
   }, [brands, q]);
 
-  // أكبر slidesPerView = 4 → فعّل الـloop فقط لو عدد السلايدز أكبر من 4
   const slidesCount = filtered?.length || 0;
   const canLoop = slidesCount > 4;
 
-  // الكارت باستايلك القديم تمامًا
   const Card = ({ b }) => (
     <Box
       position="relative"
@@ -183,7 +195,7 @@ export default function BrandsSlider({
         fontSize="16px"
         borderRadius="12px"
         boxShadow="0 12px 26px rgba(11,99,255,.25)"
-        onClick={() => open({ brand: b?.name, device: "" })}
+        onClick={() => open({ brand: b?.name, device: "" })}
       >
         {lang === "ar" ? btnAr : btnEn}
       </Button>
@@ -205,7 +217,15 @@ export default function BrandsSlider({
         {/* العنوان */}
         <VStack spacing={4} mb={6}>
           <Box w="72px" h="6px" borderRadius="6px" bg="#0B63FF" />
-          <Heading as="h2" m={0} fontWeight="800" fontSize={{ base: "32px", md: "48px" }} letterSpacing="-0.02em" color="#0E0E0E" textAlign="center">
+          <Heading
+            as="h2"
+            m={0}
+            fontWeight="800"
+            fontSize={{ base: "32px", md: "48px" }}
+            letterSpacing="-0.02em"
+            color="#0E0E0E"
+            textAlign="center"
+          >
             {lang === "ar" ? titleAr : titleEn}
           </Heading>
         </VStack>
@@ -227,56 +247,67 @@ export default function BrandsSlider({
           />
         </Box>
 
-        {/* أزرار السابق/التالي */}
-        <HStack gap="10px" mb="3" justify={{ base: "center", md: "flex-start" }}>
-          <Button
-            ref={prevRef}
-            w="42px"
-            h="42px"
-            borderRadius="12px"
-            border="1px solid #E3E6EF"
-            bg="#fff"
-            boxShadow="0 6px 14px rgba(0,0,0,.06)"
-            fontSize="22px"
-            lineHeight="1"
-            color="#1b1b1b"
-            _hover={{ bg: "#F7FAFF", transform: "translateY(-1px)", boxShadow: "0 10px 20px rgba(0,0,0,.09)" }}
-          >
-            {L.dir === "rtl" ? "›" : "‹"}
-          </Button>
-          <Button
-            ref={nextRef}
-            w="42px"
-            h="42px"
-            borderRadius="12px"
-            border="1px solid #E3E6EF"
-            bg="#fff"
-            boxShadow="0 6px 14px rgba(0,0,0,.06)"
-            fontSize="22px"
-            lineHeight="1"
-            color="#1b1b1b"
-            _hover={{ bg: "#F7FAFF", transform: "translateY(-1px)", boxShadow: "0 10px 20px rgba(0,0,0,.09)" }}
-          >
-            {L.dir === "rtl" ? "‹" : "›"}
-          </Button>
-        </HStack>
+        {/* أزرار السابق/التالي — مخفية على الموبايل */}
+        {isDesktop && (
+          <HStack gap="10px" mb="3" justify="flex-start">
+            <Button
+              ref={prevRef}
+              w="42px"
+              h="42px"
+              borderRadius="12px"
+              border="1px solid #E3E6EF"
+              bg="#fff"
+              boxShadow="0 6px 14px rgba(0,0,0,.06)"
+              fontSize="22px"
+              lineHeight="1"
+              color="#1b1b1b"
+              _hover={{ bg: "#F7FAFF", transform: "translateY(-1px)", boxShadow: "0 10px 20px rgba(0,0,0,.09)" }}
+            >
+              {L.dir === "rtl" ? "‹" : "‹"}
+            </Button>
+            <Button
+              ref={nextRef}
+              w="42px"
+              h="42px"
+              borderRadius="12px"
+              border="1px solid #E3E6EF"
+              bg="#fff"
+              boxShadow="0 6px 14px rgba(0,0,0,.06)"
+              fontSize="22px"
+              lineHeight="1"
+              color="#1b1b1b"
+              _hover={{ bg: "#F7FAFF", transform: "translateY(-1px)", boxShadow: "0 10px 20px rgba(0,0,0,.09)" }}
+            >
+              {L.dir === "rtl" ? "›" : "›"}
+            </Button>
+          </HStack>
+        )}
 
         {/* السلايدر */}
         <Box>
           <Swiper
-            key={`${canLoop}-${slidesCount}`}
+            key={`${canLoop}-${slidesCount}-${isDesktop}`}           // إعادة تهيئة عند تغيير الـbreakpoint
             modules={[Autoplay, Navigation]}
             slidesPerView={1}
             spaceBetween={20}
             loop={canLoop}
             speed={speed}
-            autoplay={canLoop ? { delay: autoplayDelay, disableOnInteraction: false, pauseOnMouseEnter: true } : false}
+            autoplay={
+              canLoop ? { delay: autoplayDelay, disableOnInteraction: false, pauseOnMouseEnter: true } : false
+            }
             slidesPerGroup={1}
             allowTouchMove={slidesCount > 1}
-            navigation={{ prevEl: prevRef.current, nextEl: nextRef.current }}
+            /* ✅ فعّل Navigation فقط على الديسكتوب */
+            navigation={
+              isDesktop
+                ? { prevEl: prevRef.current, nextEl: nextRef.current }
+                : false
+            }
             onBeforeInit={(swiper) => {
-              swiper.params.navigation.prevEl = prevRef.current;
-              swiper.params.navigation.nextEl = nextRef.current;
+              if (isDesktop) {
+                swiper.params.navigation.prevEl = prevRef.current;
+                swiper.params.navigation.nextEl = nextRef.current;
+              }
             }}
             breakpoints={{
               640: { slidesPerView: 2 },
@@ -288,7 +319,6 @@ export default function BrandsSlider({
             {loading ? (
               Array.from({ length: 4 }).map((_, i) => (
                 <SwiperSlide key={`skeleton-${i}`}>
-                  {/* ➊ فراغ علوي داخل السلايد نفسه علشان الدائرة تبان كاملة */}
                   <Box pt="78px">
                     <Box
                       h="360px"
@@ -303,7 +333,6 @@ export default function BrandsSlider({
             ) : filtered?.length ? (
               filtered.map((b, idx) => (
                 <SwiperSlide key={`brand-${idx}-${b?.id ?? b?.slug ?? b?.en ?? b?.name ?? "x"}`}>
-                  {/* ➋ نفس الفكرة: ندي السلايد نفسه paddingTop بدل ما نغيّر overflow */}
                   <Box pt="78px">
                     <Card b={b} />
                   </Box>

@@ -4,21 +4,20 @@ import {
   Box, Container, Grid, GridItem, Heading, Text, HStack, Button, Image
 } from "@chakra-ui/react";
 import { useLocation } from "react-router-dom";
-// 👇 عدّل المسار حسب مكان الملف عندك
 import { useRequestModal } from "../contexts/RequestModalContext";
 
 export default function HeroSplit({
-  lang: forcedLang,                    // "ar" | "en" | undefined
+  lang: forcedLang,
   imageSrc = "/assets/features.png",
   primaryHref = "#",
   secondaryHref = "#",
   onPrimary,
   onSecondary,
-  brandName = "",                      // ✅ جديدة: اسم البراند لو عايز تبعته للمودال
+  brandName = "",
 }) {
   const { pathname } = useLocation();
   const isEn = (forcedLang || (pathname.startsWith("/en") ? "en" : "ar")) === "en";
-  const { open } = useRequestModal();  // ✅ هانستخدمها لفتح المودال
+  const { open } = useRequestModal();
 
   const t = isEn
     ? {
@@ -34,7 +33,6 @@ export default function HeroSplit({
         ),
         primary: "Book Service Now",
         ghost: "Free Consultation",
-        textAlign: "left",
       }
     : {
         dir: "rtl",
@@ -50,22 +48,47 @@ export default function HeroSplit({
         ),
         primary: "احجز صيانة الآن",
         ghost: "استشارة مجانية",
-        textAlign: "right",
       };
 
   return (
     <Box as="section" dir={t.dir} bg="white" py={{ base: 8, md: 12 }}>
       <Container maxW="6xl">
         <Grid
-          templateAreas={{ base: `"text" "image"`, md: `"text image"` }}
+          templateAreas={{
+            base: `"image" "text"`, // 📌 على الموبايل: الصورة فوق النص
+            md: `"text image"`,     // 📌 على الديسكتوب: النص على الشمال أو اليمين
+          }}
           templateColumns={{ base: "1fr", md: "1fr 1fr" }}
           gap={{ base: 8, md: 12 }}
           alignItems="center"
         >
+          {/* الصورة */}
+          <GridItem area="image">
+            <Box>
+              <Image
+                src={imageSrc}
+                alt={isEn ? "Home appliances" : "أجهزة منزلية"}
+                w="100%"
+                objectFit="cover"
+                borderRadius="18px"
+              />
+            </Box>
+          </GridItem>
+
           {/* النص */}
           <GridItem area="text">
-            <Box textAlign={t.textAlign}>
-              <Box as="span" display="inline-block" w="72px" h="6px" borderRadius="6px" bg="#0B63FF" mb={4} />
+            <Box
+              textAlign={{ base: "center", md: isEn ? "left" : "right" }} // 📌 موبايل Center
+            >
+              <Box
+                as="span"
+                display="inline-block"
+                w="72px"
+                h="6px"
+                borderRadius="6px"
+                bg="#0B63FF"
+                mb={4}
+              />
 
               <Heading
                 as="h1"
@@ -75,27 +98,39 @@ export default function HeroSplit({
                 color="gray.900"
                 mb={3}
               >
-                <Box as="span" display="block" color="#0B63FF" fontWeight="800" fontSize={{ base: "28px", md: "36px", lg: "42px" }}>
+                <Box
+                  as="span"
+                  display="block"
+                  color="#0B63FF"
+                  fontWeight="800"
+                  fontSize={{ base: "28px", md: "36px", lg: "42px" }}
+                >
                   {t.accentLabel}
                 </Box>
                 {t.titleRest}
               </Heading>
 
-              <Text color="#6B7180" fontSize="17px" lineHeight="32px" mb={6}>
+              <Text
+                color="#6B7180"
+                fontSize="17px"
+                lineHeight="32px"
+                mb={6}
+              >
                 {t.sub}
               </Text>
 
-              <HStack spacing={3} justify="flex-start" flexWrap="wrap">
-                {/* ✅ زرار الحجز — أضفت className وفتح المودال شغال */}
+              <HStack
+                spacing={3}
+                justify={{ base: "center", md: "flex-start" }} // 📌 موبايل Center
+                flexWrap="wrap"
+              >
                 <Button
                   as="a"
                   href={primaryHref}
                   onClick={(e) => {
                     onPrimary?.(e);
-                    // افتح المودال مع البراند (لو مبعوت) + device فاضي
                     open({ brand: brandName || "", device: "" });
                   }}
-                  className="btn-main"
                   h="56px"
                   px="24px"
                   borderRadius="12px"
@@ -124,19 +159,6 @@ export default function HeroSplit({
                   {t.ghost}
                 </Button>
               </HStack>
-            </Box>
-          </GridItem>
-
-          {/* الصورة */}
-          <GridItem area="image">
-            <Box>
-              <Image
-                src={imageSrc}
-                alt={isEn ? "Home appliances" : "أجهزة منزلية"}
-                w="100%"
-                objectFit="cover"
-                borderRadius="18px"
-              />
             </Box>
           </GridItem>
         </Grid>

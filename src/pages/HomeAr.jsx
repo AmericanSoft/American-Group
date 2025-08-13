@@ -11,7 +11,7 @@ export default function HomeAr() {
   return (
     <>
     <Hero/>
-    <LogoMarquee/>
+    <LogoMarquee />
     <About/>
     <BrandsSlider/>
     <HeroSplit/>

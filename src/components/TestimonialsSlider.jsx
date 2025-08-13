@@ -53,7 +53,7 @@ export default function TestimonialsSlider({ lang, autoplay = true }) {
     : "بعض من آراء عملائنا حول خدماتنا ومدى رضاهم عنها";
 
   return (
-    <Box as="section" dir={dir} maxW="1300px" mx="auto" px={5}>
+    <Box as="section" dir={dir} maxW="1300px" mx="auto" mt={12} px={5}>
       <Heading as="h2" size="lg" textAlign="center" color="gray.800" mb={2}>
         {title}
       </Heading>
