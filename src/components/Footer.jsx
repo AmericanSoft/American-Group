@@ -1,13 +1,13 @@
 import React, { useEffect, useMemo, useState } from "react";
 import "../styles/Footer.css";
 import LogoMarquee from "./LogoMarquee";
-import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 const COPY = {
   ar: {
     dir: "rtl",
-    companyDesc:
-      "تواصل الأمريكية جروب تعزيز مكانتها في السوق من خلال عقد شراكات استراتيجية جديدة مع مجموعة من الشركات الرائدة في مجال المنتجات المنزلية.",
+    brand: "الأمريكية جروب",
+    companyDesc: "تواصل الأمريكية جروب تعزيز مكانتها في السوق ...",
     mainPagesTitle: "الصفحات الاساسية",
     home: "الرئيسية",
     services: "خدمات الصيانة",
@@ -18,8 +18,9 @@ const COPY = {
   },
   en: {
     dir: "ltr",
+    brand: "American Group",
     companyDesc:
-      "American Group continues to strengthen its position in the market by establishing new strategic partnerships with leading companies in the home appliances sector.",
+      "American Group continues to strengthen its position in the market ...",
     mainPagesTitle: "Main Pages",
     home: "Home",
     services: "Maintenance Services",
@@ -49,7 +50,7 @@ function useIsMobile(bp = 768) {
 
 export default function Footer({
   lang: forcedLang,
-  footerBg = "/assets/Footer.png",
+  footerBg = "/assets/FooterImgg.png",
   bgImage = "",
   logoSrc = "/assets/logo.png",
   logoTry = ["/assets/my-logo.png", "/assets/american-logo.png", "/assets/logo.png"],
@@ -63,6 +64,9 @@ export default function Footer({
   const t = COPY[lang];
   const isLTR = t.dir === "ltr";
   const isMobile = useIsMobile(768);
+
+  // محاذاة النص حسب اللغة
+  const textAlignValue = lang === "ar" ? "right" : "center";
 
   // لوجو: جرّب مسارات متعددة
   const candidates = useMemo(() => {
@@ -151,14 +155,15 @@ export default function Footer({
         className="footer"
         dir={t.dir}
         style={{
-          textAlign: "center",
+          textAlign: textAlignValue,
           backgroundImage: footerBg ? `url('${footerBg}')` : "none",
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
       >
+
         {/* Logo + Description */}
-        <div className="footer-column logo" style={{ textAlign: "center" }}>
+        <div className="footer-column logo" style={{ textAlign: textAlignValue }}>
           <div
             className="logo-block"
             style={{
@@ -168,17 +173,18 @@ export default function Footer({
               backgroundPosition: "center",
               display: "flex",
               alignItems: "center",
-              justifyContent: "center",
+              justifyContent: lang === "ar" ? "flex-end" : "center",
               gap: 8,
               flexDirection: logoBlockDirection,
               padding: 16,
               borderRadius: 12,
             }}
           >
+            <h3>{t.brand}</h3>
             {resolvedLogo ? (
               <img
                 src={resolvedLogo}
-                alt="American Logo"
+                alt={lang === "en" ? "American Logo" : "شعار الأمريكية جروب"}
                 className="logo-img"
                 loading="lazy"
                 style={{
@@ -198,7 +204,7 @@ export default function Footer({
         </div>
 
         {/* Main Pages */}
-        <div className="footer-column" style={{ textAlign: "center" }}>
+        <div className="footer-column" style={{ textAlign: textAlignValue }}>
           <h3>{t.mainPagesTitle}</h3>
           <ul style={{ listStyle: "none", padding: 0 }}>
             <li>
@@ -216,7 +222,7 @@ export default function Footer({
         </div>
 
         {/* Policies */}
-        <div className="footer-column" style={{ textAlign: "center" }}>
+        <div className="footer-column" style={{ textAlign: textAlignValue }}>
           <h3>{t.policiesTitle}</h3>
           <ul style={{ listStyle: "none", padding: 0 }}>
             <li>
@@ -228,7 +234,7 @@ export default function Footer({
         </div>
 
         {/* Contact */}
-        <div className="footer-column" style={{ textAlign: "center" }}>
+        <div className="footer-column" style={{ textAlign: textAlignValue }}>
           <h3>{t.contactTitle}</h3>
           <div className="social-icons" style={{ display: "flex", gap: 10, justifyContent: "center" }}>
             <a href="mailto:egyamircan6@gmail.com" aria-label="Email">
@@ -245,7 +251,7 @@ export default function Footer({
         </div>
       </div>
 
-      <LogoMarquee />
+      <FooterBottom />
     </>
   );
 }
