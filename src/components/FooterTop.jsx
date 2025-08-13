@@ -43,7 +43,7 @@ export default function FooterTop({ lang: forcedLang }) {
   const t = COPY[lang];
 
   return (
-    <Box bg="white" mt={20} py={{ base: 4, md: 6 }} borderTop="1px solid" borderColor="gray.100">
+    <Box bg="white" mt={20} py={{ base: 4, md: 6 }} borderTop="1px solid" borderColor="gray.100" id="contact-section">
       <Container maxW="1100px">
         <SimpleGrid
           columns={{ base: 1, md: 2 }}

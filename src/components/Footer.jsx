@@ -1,108 +1,7 @@
-// import React from "react";
-// import "../styles/Footer.css";
-// import LogoMarquee from "./LogoMarquee";
-// import { useLocation } from "react-router-dom";
-
-// // النصوص بلغتين
-// const COPY = {
-//   ar: {
-//     dir: "rtl",
-//     companyDesc:
-//       "تواصل الأمريكية جروب تعزيز مكانتها في السوق من خلال عقد شراكات استراتيجية جديدة مع مجموعة من الشركات الرائدة في مجال المنتجات المنزلية.",
-//     mainPagesTitle: "الصفحات الاساسية",
-//     home: "الرئيسية",
-//     services: "خدمات الصيانة",
-//     about: "من نحن",
-//     policiesTitle: "السياسات والخصوصية",
-//     policies: "السياسات",
-//     contactTitle: "تواصل معنا",
-//   },
-//   en: {
-//     dir: "ltr",
-//     companyDesc:
-//       "American Group continues to strengthen its position in the market by establishing new strategic partnerships with leading companies in the home appliances sector.",
-//     mainPagesTitle: "Main Pages",
-//     home: "Home",
-//     services: "Maintenance Services",
-//     about: "About Us",
-//     policiesTitle: "Policies & Privacy",
-//     policies: "Policies",
-//     contactTitle: "Contact Us",
-//   },
-// };
-
-// export default function Footer({ lang: forcedLang }) {
-//   const { pathname } = useLocation();
-//   const isEn = pathname.startsWith("/en");
-//   const lang = forcedLang || (isEn ? "en" : "ar");
-//   const t = COPY[lang];
-
-//   return (
-//     <>
-//       <div className="footer" dir={t.dir}>
-//         {/* Logo + Description */}
-//         <div className="footer-column logo">
-//           <div className="logo-block">
-//             <img
-//               src="https://carrier-repairs.com/wp-content/uploads/2025/08/carrier-repairs.png"
-//               alt="American Logo"
-//               className="logo-img"
-//             />
-//             <h3>American</h3>
-//           </div>
-//           <p className="company-desc">{t.companyDesc}</p>
-//         </div>
-
-//         {/* Main Pages */}
-//         <div className="footer-column">
-//           <h3>{t.mainPagesTitle}</h3>
-//           <ul>
-//             <li>
-//               <a href="/">{t.home}</a>
-//             </li>
-//             <li>
-//               <a href="/services">{t.services}</a>
-//             </li>
-//             <li>
-//               <a href="/about">{t.about}</a>
-//             </li>
-//           </ul>
-//         </div>
-
-//         {/* Policies */}
-//         <div className="footer-column">
-//           <h3>{t.policiesTitle}</h3>
-//           <ul>
-//             <li>
-//               <a href="/policies">{t.policies}</a>
-//             </li>
-//           </ul>
-//         </div>
-
-//         {/* Contact */}
-//         <div className="footer-column">
-//           <h3>{t.contactTitle}</h3>
-//           <div className="social-icons">
-//             <a href="mailto:info@american.com">
-//               <img src="https://img.icons8.com/color/48/gmail-new.png" alt="Gmail" />
-//             </a>
-//             <a href="https://wa.me/01211114528">
-//               <img src="https://img.icons8.com/color/48/whatsapp--v1.png" alt="WhatsApp" />
-//             </a>
-//             <a href="https://www.facebook.com/">
-//               <img src="https://img.icons8.com/color/48/facebook.png" alt="Facebook" />
-//             </a>
-//           </div>
-//         </div>
-//       </div>
-//       <LogoMarquee />
-//     </>
-//   );
-// }
 import React, { useEffect, useMemo, useState } from "react";
 import "../styles/Footer.css";
 import LogoMarquee from "./LogoMarquee";
-import { useLocation } from "react-router-dom";
+import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 
 const COPY = {
   ar: {
@@ -131,7 +30,7 @@ const COPY = {
   },
 };
 
-// موبايل؟
+// Hook بسيط لتحديد الموبايل
 function useIsMobile(bp = 768) {
   const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
@@ -148,14 +47,6 @@ function useIsMobile(bp = 768) {
   return isMobile;
 }
 
-/**
- * props:
- * - footerBg   الخلفية الرئيسية للفوتر (section) مثال: "/assets/Footer.png"
- * - bgImage    خلفية بلوك الشعار (اختياري) لو فاضي → شفاف
- * - logoSrc    المسار الأساسي للوجو
- * - logoTry    مصفوفة مسارات إضافية نجربها لو الأساسي فشل
- * - lang       "ar" | "en" (افتراضي حسب /en)
- */
 export default function Footer({
   lang: forcedLang,
   footerBg = "/assets/Footer.png",
@@ -163,20 +54,22 @@ export default function Footer({
   logoSrc = "/assets/logo.png",
   logoTry = ["/assets/my-logo.png", "/assets/american-logo.png", "/assets/logo.png"],
 }) {
-  const { pathname } = useLocation();
-  const isEn = pathname.startsWith("/en");
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const isEn = location.pathname.startsWith("/en");
+  const prefix = isEn ? "/en" : "";
   const lang = forcedLang || (isEn ? "en" : "ar");
   const t = COPY[lang];
   const isLTR = t.dir === "ltr";
   const isMobile = useIsMobile(768);
 
-  // رتّب قائمة المحاولات (الأساسي أولاً)
+  // لوجو: جرّب مسارات متعددة
   const candidates = useMemo(() => {
     const set = new Set([logoSrc, ...(logoTry || [])].filter(Boolean));
     return Array.from(set);
   }, [logoSrc, logoTry]);
 
-  // جرّب تحمل أول لوجو شغّال
   const [resolvedLogo, setResolvedLogo] = useState("");
   useEffect(() => {
     let cancelled = false;
@@ -191,13 +84,64 @@ export default function Footer({
           });
           if (!cancelled) setResolvedLogo(url);
           break;
-        } catch {
-          // جرّب اللي بعده
-        }
+        } catch {}
       }
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [candidates]);
+
+  // سكرول ناعم مع أوفست للهيدر
+  const scrollWithOffsetById = (id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const headerOffset = 90; // عدّل حسب ارتفاع الهيدر
+    const y = el.getBoundingClientRect().top + window.pageYOffset - headerOffset;
+    window.scrollTo({ top: y, behavior: "smooth" });
+  };
+
+  // لو فيه هاش في URL بعد التنقّل
+  useEffect(() => {
+    if (location.hash) {
+      const id = location.hash.replace("#", "");
+      setTimeout(() => scrollWithOffsetById(id), 0);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname, location.hash]);
+
+  // الهوم: امسح الهاش واطلع فوق لو أنت عليها بالفعل
+  const homePath = `${prefix}/`;
+  const handleHomeClick = (e) => {
+    if (location.pathname === homePath) {
+      e.preventDefault();
+      window.history.replaceState(null, "", homePath);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
+  // هاندل الهاش من الفوتر (services)
+  const handleAnchorClick = (e, id) => {
+    e.preventDefault();
+    if (location.pathname !== homePath) {
+      navigate(homePath + `#${id}`);
+    } else {
+      scrollWithOffsetById(id);
+      if (location.hash !== `#${id}`) {
+        window.history.replaceState(null, "", `#${id}`);
+      }
+    }
+  };
+
+  // سياسات: مسار موحّد + Scroll لأعلى لو كنت فيها
+  const policiesPath = `${prefix}/policies`;
+  const handlePoliciesClick = (e) => {
+    if (location.pathname === policiesPath) {
+      e.preventDefault();
+      window.history.replaceState(null, "", policiesPath);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
 
   const logoBlockDirection = isMobile ? "column-reverse" : isLTR ? "row" : "row-reverse";
 
@@ -219,7 +163,7 @@ export default function Footer({
             className="logo-block"
             style={{
               backgroundColor: "transparent",
-              // backgroundImage: bgImage ? `url('${bgImage}')` : "none",
+              // لو عايز ترجع خلفية للبلوك كله: backgroundImage: bgImage ? `url('${bgImage}')` : "none",
               backgroundSize: "cover",
               backgroundPosition: "center",
               display: "flex",
@@ -236,6 +180,7 @@ export default function Footer({
                 src={resolvedLogo}
                 alt="American Logo"
                 className="logo-img"
+                loading="lazy"
                 style={{
                   display: "block",
                   maxWidth: 150,
@@ -244,7 +189,9 @@ export default function Footer({
                 }}
               />
             ) : null}
-            <h3>American</h3>
+            <h3 className="logo-word" style={{ margin: 0, background: "transparent" }}>
+              American
+            </h3>
           </div>
 
           <p className="company-desc">{t.companyDesc}</p>
@@ -254,9 +201,17 @@ export default function Footer({
         <div className="footer-column" style={{ textAlign: "center" }}>
           <h3>{t.mainPagesTitle}</h3>
           <ul style={{ listStyle: "none", padding: 0 }}>
-            <li><a href="/">{t.home}</a></li>
-            <li><a href="/services">{t.services}</a></li>
-            <li><a href="/about">{t.about}</a></li>
+            <li>
+              <RouterLink to={homePath} onClick={handleHomeClick}>
+                {t.home}
+              </RouterLink>
+            </li>
+            <li>
+              {/* نفس أسلوب الهيدر: هاش لينك للسيرفيسز على الهوم */}
+              <a href={`${prefix}/#services-section`} onClick={(e) => handleAnchorClick(e, "services-section")}>
+                {t.services}
+              </a>
+            </li>
           </ul>
         </div>
 
@@ -264,7 +219,11 @@ export default function Footer({
         <div className="footer-column" style={{ textAlign: "center" }}>
           <h3>{t.policiesTitle}</h3>
           <ul style={{ listStyle: "none", padding: 0 }}>
-            <li><a href="/policies">{t.policies}</a></li>
+            <li>
+              <RouterLink to={policiesPath} onClick={handlePoliciesClick}>
+                {t.policies}
+              </RouterLink>
+            </li>
           </ul>
         </div>
 
@@ -272,19 +231,21 @@ export default function Footer({
         <div className="footer-column" style={{ textAlign: "center" }}>
           <h3>{t.contactTitle}</h3>
           <div className="social-icons" style={{ display: "flex", gap: 10, justifyContent: "center" }}>
-            <a href="mailto:info@american.com">
-              <img src="https://img.icons8.com/color/48/gmail-new.png" alt="Gmail" />
+            <a href="mailto:egyamircan6@gmail.com" aria-label="Email">
+              <img src="https://img.icons8.com/color/48/gmail-new.png" alt="Gmail" loading="lazy" />
             </a>
-            <a href="https://wa.me/01211114528">
-              <img src="https://img.icons8.com/color/48/whatsapp--v1.png" alt="WhatsApp" />
+            {/* واتساب لازم بصيغة دولية صحيحة: مصر 20 */}
+            <a href="https://wa.me/201211114528" target="_blank" rel="noreferrer" aria-label="WhatsApp">
+              <img src="https://img.icons8.com/color/48/whatsapp--v1.png" alt="WhatsApp" loading="lazy" />
             </a>
-            <a href="https://www.facebook.com/">
-              <img src="https://img.icons8.com/color/48/facebook.png" alt="Facebook" />
+            <a href="https://www.facebook.com/americangruop/" target="_blank" rel="noreferrer" aria-label="Facebook">
+              <img src="https://img.icons8.com/color/48/facebook.png" alt="Facebook" loading="lazy" />
             </a>
           </div>
         </div>
       </div>
-      <LogoMarquee  />
+
+      <LogoMarquee />
     </>
   );
 }

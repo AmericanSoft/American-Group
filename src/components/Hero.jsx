@@ -35,7 +35,7 @@ export default function Hero({ lang: forcedLang }) {
       color="white"
       bgGradient="linear(to-b, gray.900, gray.800)"
       position="relative"
-      minH={{ base: "70vh", md: "80vh" }} // ارتفاع مرن
+      minH={{ base: "70vh", md: "70vh" }} // ارتفاع مرن
       display="grid"
       placeItems="center" // سنتر رأسي وأفقي
       overflow="hidden"

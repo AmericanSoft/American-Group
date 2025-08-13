@@ -205,6 +205,7 @@ export default function BrandsSlider({
   return (
     <Box
       as="section"
+      id="services-section"
       dir={L.dir}
       py={{ base: 12, md: 16 }}
       px={4}
