@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import "../styles/Footer.css";
 import LogoMarquee from "./LogoMarquee";
-import { useLocation } from "react-router-dom";
-
+import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
+import FooterBottom from "./FooterBottom";
 const COPY = {
   ar: {
     dir: "rtl",
@@ -19,8 +19,7 @@ const COPY = {
   en: {
     dir: "ltr",
     brand: "American Group",
-    companyDesc:
-      "American Group continues to strengthen its position in the market ...",
+    companyDesc: "American Group continues to strengthen its position in the market ...",
     mainPagesTitle: "Main Pages",
     home: "Home",
     services: "Maintenance Services",
@@ -161,7 +160,6 @@ export default function Footer({
           backgroundPosition: "center",
         }}
       >
-
         {/* Logo + Description */}
         <div className="footer-column logo" style={{ textAlign: textAlignValue }}>
           <div
@@ -195,9 +193,6 @@ export default function Footer({
                 }}
               />
             ) : null}
-            <h3 className="logo-word" style={{ margin: 0, background: "transparent" }}>
-              American
-            </h3>
           </div>
 
           <p className="company-desc">{t.companyDesc}</p>
