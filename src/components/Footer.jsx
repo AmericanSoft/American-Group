@@ -103,12 +103,13 @@ import React, { useEffect, useMemo, useState } from "react";
 import "../styles/Footer.css";
 import LogoMarquee from "./LogoMarquee";
 import { useLocation } from "react-router-dom";
+import FooterBottom from "./FooterBottom";
 
 const COPY = {
   ar: {
     dir: "rtl",
-    companyDesc:
-      "تواصل الأمريكية جروب تعزيز مكانتها في السوق من خلال عقد شراكات استراتيجية جديدة مع مجموعة من الشركات الرائدة في مجال المنتجات المنزلية.",
+    brand: "الأمريكية جروب",
+    companyDesc: "تواصل الأمريكية جروب تعزيز مكانتها في السوق ...",
     mainPagesTitle: "الصفحات الاساسية",
     home: "الرئيسية",
     services: "خدمات الصيانة",
@@ -119,8 +120,9 @@ const COPY = {
   },
   en: {
     dir: "ltr",
+    brand: "American Group",
     companyDesc:
-      "American Group continues to strengthen its position in the market by establishing new strategic partnerships with leading companies in the home appliances sector.",
+      "American Group continues to strengthen its position in the market ...",
     mainPagesTitle: "Main Pages",
     home: "Home",
     services: "Maintenance Services",
@@ -158,7 +160,7 @@ function useIsMobile(bp = 768) {
  */
 export default function Footer({
   lang: forcedLang,
-  footerBg = "/assets/Footer.png",
+  footerBg = "/assets/FooterImgg.png",
   bgImage = "",
   logoSrc = "/assets/logo.png",
   logoTry = ["/assets/my-logo.png", "/assets/american-logo.png", "/assets/logo.png"],
@@ -169,6 +171,9 @@ export default function Footer({
   const t = COPY[lang];
   const isLTR = t.dir === "ltr";
   const isMobile = useIsMobile(768);
+
+  // محاذاة النص حسب اللغة
+  const textAlignValue = lang === "ar" ? "right" : "center";
 
   // رتّب قائمة المحاولات (الأساسي أولاً)
   const candidates = useMemo(() => {
@@ -196,7 +201,9 @@ export default function Footer({
         }
       }
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [candidates]);
 
   const logoBlockDirection = isMobile ? "column-reverse" : isLTR ? "row" : "row-reverse";
@@ -207,14 +214,15 @@ export default function Footer({
         className="footer"
         dir={t.dir}
         style={{
-          textAlign: "center",
+          textAlign: textAlignValue,
           backgroundImage: footerBg ? `url('${footerBg}')` : "none",
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
       >
+
         {/* Logo + Description */}
-        <div className="footer-column logo" style={{ textAlign: "center" }}>
+        <div className="footer-column logo" style={{ textAlign: textAlignValue }}>
           <div
             className="logo-block"
             style={{
@@ -224,17 +232,18 @@ export default function Footer({
               backgroundPosition: "center",
               display: "flex",
               alignItems: "center",
-              justifyContent: "center",
+              justifyContent: lang === "ar" ? "flex-end" : "center",
               gap: 8,
               flexDirection: logoBlockDirection,
               padding: 16,
               borderRadius: 12,
             }}
           >
+            <h3>{t.brand}</h3>
             {resolvedLogo ? (
               <img
                 src={resolvedLogo}
-                alt="American Logo"
+                alt={lang === "en" ? "American Logo" : "شعار الأمريكية جروب"}
                 className="logo-img"
                 style={{
                   display: "block",
@@ -244,16 +253,15 @@ export default function Footer({
                 }}
               />
             ) : null}
-            <h3>American</h3>
           </div>
 
           <p className="company-desc">{t.companyDesc}</p>
         </div>
 
         {/* Main Pages */}
-        <div className="footer-column" style={{ textAlign: "center" }}>
+        <div className="footer-column" style={{ textAlign: textAlignValue }}>
           <h3>{t.mainPagesTitle}</h3>
-          <ul style={{ listStyle: "none", padding: 0 }}>
+          <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
             <li><a href="/">{t.home}</a></li>
             <li><a href="/services">{t.services}</a></li>
             <li><a href="/about">{t.about}</a></li>
@@ -261,17 +269,24 @@ export default function Footer({
         </div>
 
         {/* Policies */}
-        <div className="footer-column" style={{ textAlign: "center" }}>
+        <div className="footer-column" style={{ textAlign: textAlignValue }}>
           <h3>{t.policiesTitle}</h3>
-          <ul style={{ listStyle: "none", padding: 0 }}>
+          <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
             <li><a href="/policies">{t.policies}</a></li>
           </ul>
         </div>
 
         {/* Contact */}
-        <div className="footer-column" style={{ textAlign: "center" }}>
+        <div className="footer-column" style={{ textAlign: textAlignValue }}>
           <h3>{t.contactTitle}</h3>
-          <div className="social-icons" style={{ display: "flex", gap: 10, justifyContent: "center" }}>
+          <div
+            className="social-icons"
+            style={{
+              display: "flex",
+              gap: 10,
+              justifyContent: lang === "ar" ? "flex-end" : "center",
+            }}
+          >
             <a href="mailto:info@american.com">
               <img src="https://img.icons8.com/color/48/gmail-new.png" alt="Gmail" />
             </a>
@@ -284,7 +299,8 @@ export default function Footer({
           </div>
         </div>
       </div>
-      <LogoMarquee  />
+
+      <FooterBottom />
     </>
   );
 }

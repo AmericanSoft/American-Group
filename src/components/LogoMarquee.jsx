@@ -147,7 +147,7 @@ export default function LogoMarquee({
     <Box
       as="section"
       w="100%"
-      bg="#142442" // ✅ خلفية شفافة
+      bg="#fff" // ✅ خلفية شفافة
       px={px}
       py={py}
       overflow="hidden"

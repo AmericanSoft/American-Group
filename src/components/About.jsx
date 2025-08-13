@@ -56,18 +56,32 @@ export default function About({
   textAlign={{ base: "center", md: "start" }}
   mb={8}
   position="relative"
-  display={{ base: "block", md: "inline-block"  }} // 📌 خليها block على الموبايل
+  display={{ base: "block", md: "inline-block" }}
 >
+  {/* الخط الأزرق في الموبايل فوق العنوان */}
+  <Box
+    display={{ base: "block", md: "none" }}
+    mx="auto"
+    mb="8px"
+    w="64px"
+    h="6px"
+    bg="#0b63ff"
+    borderRadius="6px"
+  />
+
   <Heading
     as="h2"
     fontWeight="800"
     fontSize={{ base: "28px", md: "44px" }}
     color="gray.900"
-    textAlign={{ base: "center", md: "start" }} // 📌 نفس الفكرة للعنوان
+    textAlign={{ base: "center", md: "start" }}
   >
     {t.title}
   </Heading>
+
+  {/* الخط الأزرق في الديسكتوب على يمين أو يسار العنوان */}
   <Box
+    display={{ base: "none", md: "block" }}
     position="absolute"
     {...(t.dir === "rtl" ? { right: 0 } : { left: 0 })}
     top="-10px"
@@ -77,6 +91,7 @@ export default function About({
     borderRadius="6px"
   />
 </Box>
+
 
 
         {/* الشبكة */}
@@ -141,6 +156,7 @@ export default function About({
   fontSize="20px"       
   px={8}               
   py={8}             
+  mt={8}
   borderRadius="14px"   
 
         boxShadow="0 10px 22px rgba(11,99,255,0.25)"
