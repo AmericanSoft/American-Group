@@ -1,8 +1,6 @@
-
 import React from "react";
 import { Box, HStack, Image, Link, usePrefersReducedMotion } from "@chakra-ui/react";
 
-// لوجوهات افتراضية — بدّل زي ما تحب
 const DEFAULT_LOGOS = [
   { src: "/assets/samsung.webp", alt: "Samsung" },
   { src: "/assets/Chiller-Egypt.png", alt: "Chiller Egypt" },
@@ -14,12 +12,12 @@ const DEFAULT_LOGOS = [
 
 export default function FooterBottom({
   logos = DEFAULT_LOGOS,
-  gap = 64,           // px المسافة بين الشعارات
-  logoH = 70,         // px ارتفاع الشعار
-  duration = 10,      // ثواني: قللها تبقى أسرع (مثلاً 6)
+  gap = 64,          // px
+  logoH = 70,        // px
+  duration = 10,     // seconds
   px = 0,
   py = 4,
-  softEdges = true,   // قناع ناعم على الحواف
+  softEdges = false, // gradient mask on edges
   pauseOnHover = false,
 }) {
   const prefersReduced = usePrefersReducedMotion();
@@ -29,7 +27,6 @@ export default function FooterBottom({
     <Box
       as="section"
       w="100%"
-      bg="#142442" // ✅ خلفية شفافة
       px={px}
       py={py}
       overflow="hidden"
@@ -46,7 +43,7 @@ export default function FooterBottom({
           : {}
       }
     >
-      {/* Keyframes محلية: دخول من اليمين -> خروج من الشمال */}
+      {/* local keyframes */}
       <Box
         as="style"
         dangerouslySetInnerHTML={{
@@ -62,7 +59,6 @@ export default function FooterBottom({
         }}
       />
 
-      {/* التِراك: نكرر المجموعة مرتين علشان اللوب يبقى ناعم */}
       <Box
         className="logo-track"
         display="flex"
@@ -75,7 +71,7 @@ export default function FooterBottom({
         }}
         _hover={pauseOnHover ? { animationPlayState: "paused" } : undefined}
       >
-        {/* SET A */}
+        {/* A */}
         <HStack align="center" spacing={0} pl="40px" sx={{ columnGap: `${gap}px` }}>
           {safeLogos.map((l, i) => (
             <Link key={`a-${i}`} href={l.href || "#"} _hover={{ opacity: 0.9 }}>
@@ -85,17 +81,25 @@ export default function FooterBottom({
                 h={`${logoH}px`}
                 w="auto"
                 objectFit="contain"
-                background="transparent" // ✅ الصورة نفسها بدون خلفية
+                background="transparent"
                 loading={i < 3 ? "eager" : "lazy"}
                 decoding="async"
-                onError={(e) => { e.currentTarget.style.display = "none"; }}
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                }}
               />
             </Link>
           ))}
         </HStack>
 
-        {/* SET B (نفس الأولى تمامًا) */}
-        <HStack align="center" spacing={0} pl="40px" sx={{ columnGap: `${gap}px` }} aria-hidden="true">
+        {/* B */}
+        <HStack
+          align="center"
+          spacing={0}
+          pl="40px"
+          sx={{ columnGap: `${gap}px` }}
+          aria-hidden="true"
+        >
           {safeLogos.map((l, i) => (
             <Link key={`b-${i}`} href={l.href || "#"} _hover={{ opacity: 0.9 }}>
               <Image
@@ -107,7 +111,9 @@ export default function FooterBottom({
                 background="transparent"
                 loading="lazy"
                 decoding="async"
-                onError={(e) => { e.currentTarget.style.display = "none"; }}
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                }}
               />
             </Link>
           ))}

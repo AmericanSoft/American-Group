@@ -1,159 +1,37 @@
-/* .footer {
-  font-family: 'Cairo';
-  background-image: linear-gradient(#18479e7e, #18479e7e),
-    url('https://carrier-miraco.com/wp-content/uploads/2025/08/footer-img.png');
-  background-size: cover;
-  color: #fff;
-  padding: 40px 100px;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  direction: rtl;
-  text-align: right;
-}
-
-.footer-column {
-  flex: 1 1 200px;
-  margin: 5px;
-}
-
-.footer h3 {
-  margin-bottom: 5px;
-  font-size: 30px;
-  font-weight: 700;
-  color: white;
-  padding-bottom: 10px;
-}
-
-.footer ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.footer li {
-  height: 40px;
-}
-
-.footer a {
-  font-size: 18px;
-  text-decoration: none;
-  font-weight: 600;
-  color: white;
-}
-
-.social-icons {
-  display: flex;
-}
-
-.social-icons img {
-  width: 24px;
-  margin: 0 5px;
-  vertical-align: middle;
-}
-
-.logo {
-  display: flex;
-  color: white;
-  gap: 20px;
-}
-
-.logo h3 {
-  font-size: 30px;
-  font-weight: 900;
-}
-
-.img {
-  margin-top: -15px;
-}
-
-@media (max-width: 1025px) {
-  .footer {
-    padding: 0;
-    flex-direction: column;
-    gap: 30px;
-  }
-
-  .footer li {
-    padding: 0;
-    margin: 0;
-  }
-
-  .footer a {
-    display: block;
-    font-size: 16px;
-    line-height: 1.1;
-    padding: 5px 0;
-    color: white;
-    text-decoration: none;
-  }
-
-  .footer h3 {
-    padding-top: 40px;
-  }
-
-  .footer-column {
-    text-align: center;
-    align-items: center;
-  }
-
-  .footer-column ul a {
-    line-height: 1.2em;
-  }
-
-  .logo {
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  .social-icons {
-    padding-top: 10px;
-    justify-content: center;
-  }
-
-  .social-icons img {
-    width: 30px;
-    margin: 0 5px;
-  }
-
-  .logo h3 {
-    margin: 0;
-    margin-top: -35px;
-  }
-
-  .img {
-    margin-top: 20px;
-  }
-} */
 /* ====== Footer (RTL) ====== */
 .footer {
   font-family: "Cairo", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   color: #fff;
-  direction: rtl;
-  text-align: right;
-
-  /* الخلفية: صورة + طبقة تدرج معتمة */
-  background-image: linear-gradient(#18479e7e, #18479e7e),
-    url("https://carrier-miraco.com/wp-content/uploads/2025/08/footer-img.png");
+  text-align: right; /* يفضل نستخدمه للنصوص فقط */
   background-size: cover;
   background-position: center;
-
-  /* شبكة أعمدة مرنة */
+  width: 100%;
   display: grid;
-  grid-template-columns: repeat(4, minmax(180px, 1fr));
+  grid-template-columns: repeat(2, minmax(180px, 1fr));
   gap: 32px;
-  padding: 48px 72px;
+  height: 250px;
+  /* إضافة هاتين السطرين للمحاذاة */
+  justify-items: center; /* يوسّط الأعمدة داخل الشبكة */
+  align-items: center; /* يبقي كل عمود من فوق */
 }
 
 /* عمود عام */
 .footer-column {
-  min-width: 180px;
+  width: 40%;
 }
-
+.footer-column-logo {
+  width: 80%;
+}
+.footer-between{
+  width: 100%;
+  display: flex;
+  justify-content: center;;
+  /* align-items: center; */
+}
 /* العناوين */
 .footer h3 {
   margin: 0 0 10px;
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 800;
   color: #fff;
 }
@@ -187,9 +65,7 @@
 .logo-block {
   display: flex;
   align-items: center;
-  gap: 14px;
-  margin-bottom: 10px;
-}
+  gap: 14px;}
 .logo-img {
   width: 92px;
   height: auto;

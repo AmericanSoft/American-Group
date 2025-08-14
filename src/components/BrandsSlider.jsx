@@ -9,7 +9,7 @@ import {
   VStack,
   Text,
   Image,
-  useBreakpointValue,          // ✅ علشان نعرف احنا موبايل ولا ديسكتوب
+  useBreakpointValue, // ✅ علشان نعرف احنا موبايل ولا ديسكتوب
 } from "@chakra-ui/react";
 import { useLocation } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -51,8 +51,14 @@ const fetchWithTimeout = async (url, ms = 6000) => {
   try {
     const res = await fetch(url, { cache: "no-cache", signal: controller.signal });
     if (!res.ok) throw new Error("HTTP " + res.status);
-    try { return await res.json(); } catch { return JSON.parse(await res.text()); }
-  } finally { clearTimeout(t); }
+    try {
+      return await res.json();
+    } catch {
+      return JSON.parse(await res.text());
+    }
+  } finally {
+    clearTimeout(t);
+  }
 };
 
 export default function BrandsSlider({
@@ -63,7 +69,7 @@ export default function BrandsSlider({
   placeholderEn = STRINGS.en.placeholder,
   btnAr = STRINGS.ar.btn,
   btnEn = STRINGS.en.btn,
-  ph = "https://americangroup-eg.com/wp-content/uploads/placeholder.png",
+  ph = "assets/logo.png",
   lang: forcedLang,
   autoplayDelay = 3500,
   speed = 600,
@@ -98,15 +104,21 @@ export default function BrandsSlider({
       try {
         if (!data) {
           data = await fetchWithTimeout(json, 6000);
-          try { localStorage.setItem(key, JSON.stringify(data)); } catch {}
+          try {
+            localStorage.setItem(key, JSON.stringify(data));
+          } catch {}
         }
         if (mounted) setBrands(Array.isArray(data) ? data : []);
       } catch (e) {
         if (mounted) setBrands([]);
         console.error("Brands JSON load failed:", e);
-      } finally { if (mounted) setLoading(false); }
+      } finally {
+        if (mounted) setLoading(false);
+      }
     })();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, [json]);
 
   const filtered = useMemo(() => {
@@ -287,23 +299,17 @@ export default function BrandsSlider({
         {/* السلايدر */}
         <Box>
           <Swiper
-            key={`${canLoop}-${slidesCount}-${isDesktop}`}           // إعادة تهيئة عند تغيير الـbreakpoint
+            key={`${canLoop}-${slidesCount}-${isDesktop}`} // إعادة تهيئة عند تغيير الـbreakpoint
             modules={[Autoplay, Navigation]}
             slidesPerView={1}
             spaceBetween={20}
             loop={canLoop}
             speed={speed}
-            autoplay={
-              canLoop ? { delay: autoplayDelay, disableOnInteraction: false, pauseOnMouseEnter: true } : false
-            }
+            autoplay={canLoop ? { delay: autoplayDelay, disableOnInteraction: false, pauseOnMouseEnter: true } : false}
             slidesPerGroup={1}
             allowTouchMove={slidesCount > 1}
             /* ✅ فعّل Navigation فقط على الديسكتوب */
-            navigation={
-              isDesktop
-                ? { prevEl: prevRef.current, nextEl: nextRef.current }
-                : false
-            }
+            navigation={isDesktop ? { prevEl: prevRef.current, nextEl: nextRef.current } : false}
             onBeforeInit={(swiper) => {
               if (isDesktop) {
                 swiper.params.navigation.prevEl = prevRef.current;

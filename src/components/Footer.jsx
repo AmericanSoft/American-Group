@@ -1,13 +1,25 @@
 import React, { useEffect, useMemo, useState } from "react";
-import "../styles/Footer.css";
-import LogoMarquee from "./LogoMarquee";
+import {
+  Box,
+  Container,
+  SimpleGrid,
+  Stack,
+  HStack,
+  VStack,
+  Text,
+  Link as ChakraLink,
+  Image,
+  useBreakpointValue,
+} from "@chakra-ui/react";
 import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 import FooterBottom from "./FooterBottom";
+
 const COPY = {
   ar: {
     dir: "rtl",
     brand: "الأمريكية جروب",
-    companyDesc: "تواصل الأمريكية جروب تعزيز مكانتها في السوق ...",
+    companyDesc:
+      "الأمريكية جروب هي شركة رائدة في مجال الأجهزة المنزلية وحلول الصيانة المتكاملة، تقدم خدمات معتمدة ومعايير جودة عالية لتلبية احتياجات العملاء في جميع أنحاء مصر. نحرص على توفير أفضل المنتجات وقطع الغيار الأصلية، مع دعم فني متواصل يضمن راحة بالك وأداء مثالي لأجهزتك.",
     mainPagesTitle: "الصفحات الاساسية",
     home: "الرئيسية",
     services: "خدمات الصيانة",
@@ -19,7 +31,8 @@ const COPY = {
   en: {
     dir: "ltr",
     brand: "American Group",
-    companyDesc: "American Group continues to strengthen its position in the market ...",
+    companyDesc:
+      "American Group is a leading company in the field of home appliances and comprehensive maintenance solutions, providing certified services and high-quality standards to meet customers' needs across Egypt. We are committed to offering the best products and original spare parts, with continuous technical support to ensure your peace of mind and optimal performance for your devices.",
     mainPagesTitle: "Main Pages",
     home: "Home",
     services: "Maintenance Services",
@@ -30,44 +43,35 @@ const COPY = {
   },
 };
 
-// Hook بسيط لتحديد الموبايل
-function useIsMobile(bp = 768) {
-  const [isMobile, setIsMobile] = useState(false);
-  useEffect(() => {
-    const mql = window.matchMedia(`(max-width: ${bp}px)`);
-    const onChange = (e) => setIsMobile(e.matches);
-    setIsMobile(mql.matches);
-    if (mql.addEventListener) mql.addEventListener("change", onChange);
-    else mql.addListener(onChange);
-    return () => {
-      if (mql.removeEventListener) mql.removeEventListener("change", onChange);
-      else mql.removeListener(onChange);
-    };
-  }, [bp]);
-  return isMobile;
-}
-
 export default function Footer({
   lang: forcedLang,
   footerBg = "/assets/FooterImgg.png",
-  bgImage = "",
   logoSrc = "/assets/logo.png",
   logoTry = ["/assets/my-logo.png", "/assets/american-logo.png", "/assets/logo.png"],
 }) {
   const location = useLocation();
   const navigate = useNavigate();
-
   const isEn = location.pathname.startsWith("/en");
   const prefix = isEn ? "/en" : "";
   const lang = forcedLang || (isEn ? "en" : "ar");
   const t = COPY[lang];
-  const isLTR = t.dir === "ltr";
-  const isMobile = useIsMobile(768);
 
-  // محاذاة النص حسب اللغة
-  const textAlignValue = lang === "ar" ? "right" : "center";
+  // موبايل؟
+  const isMobile = useBreakpointValue({ base: true, md: false });
 
-  // لوجو: جرّب مسارات متعددة
+  // محاذاة ريسبونسف: موبايل سنتر، دسك توب يمين/شمال حسب اللغة
+  const textAlignProp = useBreakpointValue({
+    base: "center",
+    md: lang === "ar" ? "right" : "left",
+  });
+
+  // اتجاه بلوك اللوجو: موبايل عمودي، دسك توب صف عادي (من غير row-reverse)
+  const logoBlockDirection = useBreakpointValue({
+    base: "column-reverse",
+    md: "row",
+  });
+
+  // جرّب مسارات متعددة للّوجو
   const candidates = useMemo(() => {
     const set = new Set([logoSrc, ...(logoTry || [])].filter(Boolean));
     return Array.from(set);
@@ -80,7 +84,7 @@ export default function Footer({
       for (const url of candidates) {
         try {
           await new Promise((res, rej) => {
-            const img = new Image();
+            const img = new window.Image();
             img.onload = () => res();
             img.onerror = rej;
             img.src = url;
@@ -99,12 +103,11 @@ export default function Footer({
   const scrollWithOffsetById = (id) => {
     const el = document.getElementById(id);
     if (!el) return;
-    const headerOffset = 90; // عدّل حسب ارتفاع الهيدر
+    const headerOffset = 90;
     const y = el.getBoundingClientRect().top + window.pageYOffset - headerOffset;
     window.scrollTo({ top: y, behavior: "smooth" });
   };
 
-  // لو فيه هاش في URL بعد التنقّل
   useEffect(() => {
     if (location.hash) {
       const id = location.hash.replace("#", "");
@@ -113,7 +116,6 @@ export default function Footer({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname, location.hash]);
 
-  // الهوم: امسح الهاش واطلع فوق لو أنت عليها بالفعل
   const homePath = `${prefix}/`;
   const handleHomeClick = (e) => {
     if (location.pathname === homePath) {
@@ -123,7 +125,6 @@ export default function Footer({
     }
   };
 
-  // هاندل الهاش من الفوتر (services)
   const handleAnchorClick = (e, id) => {
     e.preventDefault();
     if (location.pathname !== homePath) {
@@ -136,7 +137,6 @@ export default function Footer({
     }
   };
 
-  // سياسات: مسار موحّد + Scroll لأعلى لو كنت فيها
   const policiesPath = `${prefix}/policies`;
   const handlePoliciesClick = (e) => {
     if (location.pathname === policiesPath) {
@@ -146,107 +146,180 @@ export default function Footer({
     }
   };
 
-  const logoBlockDirection = isMobile ? "column-reverse" : isLTR ? "row" : "row-reverse";
-
   return (
     <>
-      <div
-        className="footer"
+      <Box
+        as="footer"
         dir={t.dir}
-        style={{
-          textAlign: textAlignValue,
-          backgroundImage: footerBg ? `url('${footerBg}')` : "none",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
+        color="white"
+        bgImage={footerBg ? `url('${footerBg}')` : "none"}
+        bgSize="cover"
+        bgPosition="center"
+        px={{ base: 4, sm: 6, md: 8 }}
+        py={{ base: 6, sm: 8, md: 10, lg: 14 }}
       >
-        {/* Logo + Description */}
-        <div className="footer-column logo" style={{ textAlign: textAlignValue }}>
-          <div
-            className="logo-block"
-            style={{
-              backgroundColor: "transparent",
-              // لو عايز ترجع خلفية للبلوك كله: backgroundImage: bgImage ? `url('${bgImage}')` : "none",
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: lang === "ar" ? "flex-end" : "center",
-              gap: 8,
-              flexDirection: logoBlockDirection,
-              padding: 16,
-              borderRadius: 12,
-            }}
-          >
-            <h3>{t.brand}</h3>
-            {resolvedLogo ? (
-              <img
-                src={resolvedLogo}
-                alt={lang === "en" ? "American Logo" : "شعار الأمريكية جروب"}
-                className="logo-img"
-                loading="lazy"
-                style={{
-                  display: "block",
-                  maxWidth: 150,
-                  height: "auto",
-                  objectFit: "contain",
-                }}
-              />
-            ) : null}
-          </div>
+        <Container maxW="7xl">
+          <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: 6, md: 8, lg: 10 }}>
+            {/* Logo + Description */}
+            <Stack spacing={4} align={isMobile ? "center" : "stretch"} textAlign={textAlignProp}>
+              <HStack
+                spacing={{ base: 2, md: 3 }}
+                align="center"
+                justify={{ base: "center", md: "flex-start" }} // في RTL flex-start = يمين، و LTR = شمال
+                flexDirection={logoBlockDirection}
+                w="full"
+              >
+                <Text as="h3" m={0} fontSize={{ base: "lg", md: "xl" }} fontWeight="extrabold">
+                  {t.brand}
+                </Text>
+                {resolvedLogo ? (
+                  <Image
+                    src={resolvedLogo}
+                    alt={lang === "en" ? "American Logo" : "شعار الأمريكية جروب"}
+                    loading="lazy"
+                    maxW={{ base: "140px", md: "180px" }}
+                    objectFit="contain"
+                  />
+                ) : null}
+              </HStack>
 
-          <p className="company-desc">{t.companyDesc}</p>
-        </div>
+              <Text
+                fontSize={{ base: "sm", md: "md" }}
+                lineHeight="1.9"
+                color="whiteAlpha.800"
+                maxW={{ base: "full", md: "720px" }}
+                mx={{ base: "auto", md: "unset" }}
+              >
+                {t.companyDesc}
+              </Text>
+            </Stack>
 
-        {/* Main Pages */}
-        <div className="footer-column" style={{ textAlign: textAlignValue }}>
-          <h3>{t.mainPagesTitle}</h3>
-          <ul style={{ listStyle: "none", padding: 0 }}>
-            <li>
-              <RouterLink to={homePath} onClick={handleHomeClick}>
-                {t.home}
-              </RouterLink>
-            </li>
-            <li>
-              {/* نفس أسلوب الهيدر: هاش لينك للسيرفيسز على الهوم */}
-              <a href={`${prefix}/#services-section`} onClick={(e) => handleAnchorClick(e, "services-section")}>
-                {t.services}
-              </a>
-            </li>
-          </ul>
-        </div>
+            {/* Main Pages */}
+            <Stack spacing={3} textAlign={textAlignProp} align={isMobile ? "center" : "stretch"}>
+              <Text as="h3" fontSize="lg" fontWeight="bold">
+                {t.mainPagesTitle}
+              </Text>
+              <VStack align={isMobile ? "center" : "stretch"} spacing={1}>
+                <ChakraLink
+                  as={RouterLink}
+                  to={homePath}
+                  onClick={handleHomeClick}
+                  px={2}
+                  py={2}
+                  rounded="md"
+                  _hover={{ bg: "whiteAlpha.200" }}
+                  w={isMobile ? "full" : "auto"}
+                >
+                  {t.home}
+                </ChakraLink>
 
-        {/* Policies */}
-        <div className="footer-column" style={{ textAlign: textAlignValue }}>
-          <h3>{t.policiesTitle}</h3>
-          <ul style={{ listStyle: "none", padding: 0 }}>
-            <li>
-              <RouterLink to={policiesPath} onClick={handlePoliciesClick}>
-                {t.policies}
-              </RouterLink>
-            </li>
-          </ul>
-        </div>
+                <ChakraLink
+                  href={`${prefix}/#services-section`}
+                  onClick={(e) => handleAnchorClick(e, "services-section")}
+                  px={2}
+                  py={2}
+                  rounded="md"
+                  _hover={{ bg: "whiteAlpha.200" }}
+                  w={isMobile ? "full" : "auto"}
+                >
+                  {t.services}
+                </ChakraLink>
+              </VStack>
+            </Stack>
 
-        {/* Contact */}
-        <div className="footer-column" style={{ textAlign: textAlignValue }}>
-          <h3>{t.contactTitle}</h3>
-          <div className="social-icons" style={{ display: "flex", gap: 10, justifyContent: "center" }}>
-            <a href="mailto:egyamircan6@gmail.com" aria-label="Email">
-              <img src="https://img.icons8.com/color/48/gmail-new.png" alt="Gmail" loading="lazy" />
-            </a>
-            {/* واتساب لازم بصيغة دولية صحيحة: مصر 20 */}
-            <a href="https://wa.me/201211114528" target="_blank" rel="noreferrer" aria-label="WhatsApp">
-              <img src="https://img.icons8.com/color/48/whatsapp--v1.png" alt="WhatsApp" loading="lazy" />
-            </a>
-            <a href="https://www.facebook.com/americangruop/" target="_blank" rel="noreferrer" aria-label="Facebook">
-              <img src="https://img.icons8.com/color/48/facebook.png" alt="Facebook" loading="lazy" />
-            </a>
-          </div>
-        </div>
-      </div>
+            {/* Policies + Contact */}
+            <Stack spacing={4} textAlign={textAlignProp} align={isMobile ? "center" : "stretch"}>
+              <Stack spacing={3}>
+                <Text as="h3" fontSize="lg" fontWeight="bold">
+                  {t.policiesTitle}
+                </Text>
+                <ChakraLink
+                  as={RouterLink}
+                  to={policiesPath}
+                  onClick={handlePoliciesClick}
+                  px={2}
+                  py={2}
+                  rounded="md"
+                  _hover={{ bg: "whiteAlpha.200" }}
+                  w={isMobile ? "full" : "auto"}
+                >
+                  {t.policies}
+                </ChakraLink>
+              </Stack>
 
-      <FooterBottom />
+              <Stack spacing={3} pt={{ base: 2, md: 4 }}>
+                <Text as="h3" fontSize="lg" fontWeight="bold">
+                  {t.contactTitle}
+                </Text>
+                <HStack spacing={3} justify={isMobile ? "center" : "flex-start"}>
+                  <ChakraLink
+                    href="mailto:egyamircan6@gmail.com"
+                    aria-label="Email"
+                    w="44px"
+                    h="44px"
+                    display="inline-flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    rounded="lg"
+                    bg="whiteAlpha.200"
+                    _hover={{ transform: "translateY(-1px)", bg: "whiteAlpha.300" }}
+                    transition="all .15s ease"
+                  >
+                    <Image src="https://img.icons8.com/color/48/gmail-new.png" alt="Gmail" boxSize="24px" />
+                  </ChakraLink>
+
+                  <ChakraLink
+                    href="https://wa.me/201211114528"
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label="WhatsApp"
+                    w="44px"
+                    h="44px"
+                    display="inline-flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    rounded="lg"
+                    bg="whiteAlpha.200"
+                    _hover={{ transform: "translateY(-1px)", bg: "whiteAlpha.300" }}
+                    transition="all .15s ease"
+                  >
+                    <Image src="https://img.icons8.com/color/48/whatsapp--v1.png" alt="WhatsApp" boxSize="24px" />
+                  </ChakraLink>
+
+                  <ChakraLink
+                    href="https://www.facebook.com/americangruop/"
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label="Facebook"
+                    w="44px"
+                    h="44px"
+                    display="inline-flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    rounded="lg"
+                    bg="whiteAlpha.200"
+                    _hover={{ transform: "translateY(-1px)", bg: "whiteAlpha.300" }}
+                    transition="all .15s ease"
+                  >
+                    <Image src="https://img.icons8.com/color/48/facebook.png" alt="Facebook" boxSize="24px" />
+                  </ChakraLink>
+                </HStack>
+              </Stack>
+            </Stack>
+          </SimpleGrid>
+        </Container>
+      </Box>
+
+      {/* شريط الشعارات السفلي */}
+      <FooterBottom
+        gap={isMobile ? 24 : 64}
+        logoH={isMobile ? 38 : 70}
+        duration={isMobile ? 14 : 10}
+        px={isMobile ? 2 : 0}
+        py={isMobile ? 3 : 4}
+        softEdges
+        pauseOnHover={!isMobile}
+      />
     </>
   );
 }

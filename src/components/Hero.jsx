@@ -1,11 +1,9 @@
-import { Box, Container, HStack, VStack, Button, Text, Badge } from "@chakra-ui/react";
-import { SearchIcon, StarIcon } from "@chakra-ui/icons";
+import { Box, Container, HStack, VStack, Button, Text, Image } from "@chakra-ui/react";
 import { useLocation } from "react-router-dom";
 import { useRequestModal } from "../contexts/RequestModalContext";
 
 const STRINGS = {
   ar: {
-    badge: "مركز صيانة معتمد",
     titleL1: "الامريكية جروب لصيانة منتجات الاجهزة",
     titleL2: "المنزلية في مصر",
     cta: "أحجز صيانة الآن",
@@ -13,7 +11,6 @@ const STRINGS = {
     align: "center",
   },
   en: {
-    badge: "Authorized Service Center",
     titleL1: "American Group for Home Appliances",
     titleL2: "Maintenance in Egypt",
     cta: "Book Service Now",
@@ -27,6 +24,7 @@ export default function Hero({ lang: forcedLang }) {
   const isEnPath = pathname.startsWith("/en");
   const lang = forcedLang || (isEnPath ? "en" : "ar");
   const t = STRINGS[lang];
+  const isEn = lang === "en";
   const { open } = useRequestModal();
 
   return (
@@ -35,9 +33,9 @@ export default function Hero({ lang: forcedLang }) {
       color="white"
       bgGradient="linear(to-b, gray.900, gray.800)"
       position="relative"
-      minH={{ base: "70vh", md: "70vh" }} // ارتفاع مرن
+      minH={{ base: "70vh", md: "70vh" }}
       display="grid"
-      placeItems="center" // سنتر رأسي وأفقي
+      placeItems="center"
       overflow="hidden"
       px={4}
       dir={t.dir}
@@ -46,28 +44,26 @@ export default function Hero({ lang: forcedLang }) {
         position: "absolute",
         inset: 0,
         opacity: 0.15,
-        bgImage: "repeating-linear-gradient(135deg, rgba(255,255,255,0.08) 0 2px, transparent 2px 16px)",
+        bgImage:
+          "repeating-linear-gradient(135deg, rgba(255,255,255,0.08) 0 2px, transparent 2px 16px)",
         pointerEvents: "none",
-        zIndex: 0, // خلف المحتوى
+        zIndex: 0,
       }}
     >
       <Container maxW="6xl" zIndex={1}>
         {/* badge */}
         <HStack justify="center" mb={4}>
-          <Badge
-            px={4}
-            py={4}
+          <Image
+            src={isEn ? "/assets/frame-en.png" : "/assets/frame-ar.png"}
+            alt={isEn ? "Trusted service badge" : "شارة خدمة موثوقة"}
+            h={{ base: "42px", md: "48px" }}
+            objectFit="contain"
+            draggable="false"
+            loading="lazy"
             borderRadius="full"
-            bg="gray.700"
-            color="white"
-            fontWeight="semibold"
-            display="inline-flex"
-            alignItems="center"
-            gap={2}
-          >
-            {t.badge}
-            <StarIcon color="yellow.300" />
-          </Badge>
+            boxShadow="sm"
+            fallbackSrc="/assets/badge-fallback.png"
+          />
         </HStack>
 
         {/* title + CTA */}
@@ -85,7 +81,14 @@ export default function Hero({ lang: forcedLang }) {
             {t.titleL2}
           </Text>
 
-          <Button colorScheme="blue" size="lg" borderRadius="xl" px={8} height="50px" onClick={() => open({})}>
+          <Button
+            colorScheme="blue"
+            size="lg"
+            borderRadius="xl"
+            px={8}
+            h="50px"
+            onClick={() => open({})}
+          >
             {t.cta}
           </Button>
         </VStack>

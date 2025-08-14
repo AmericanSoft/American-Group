@@ -1,161 +1,165 @@
-import React, { useEffect, useState } from "react";
+// src/components/request/RequestServiceModal.jsx
+import React, { useState } from "react";
 import {
-  Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter,
-  FormControl, FormLabel, Input, Textarea, Select, Button, HStack, useToast
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Button,
+  HStack,
+  Box,
+  Badge,
+  Progress,
+  useToast,
+  Text,
+  Input,
+  Stack,
 } from "@chakra-ui/react";
+import { ArrowBackIcon, ArrowForwardIcon, CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import { useLocation } from "react-router-dom";
 
-const endpoint = import.meta.env.VITE_GAS_ENDPOINT;
+import StepContactLocation from "./StepContactLocation";
+import StepApplianceIssue from "./StepApplianceIssue";
+import StepConfirm from "./StepConfirm";
+import { useRequestForm } from "./useRequestForm";
 
-export default function RequestServiceModal({ isOpen, onClose, prefill = {} }) {
+const StepBadge = ({ idx, label, active }) => (
+  <HStack spacing={2}>
+    <Badge
+      rounded="full"
+      px={3}
+      py={1}
+      fontWeight="bold"
+      colorScheme={active ? "blue" : "gray"}
+      variant={active ? "solid" : "subtle"}
+    >
+      {idx}. {label}
+    </Badge>
+  </HStack>
+);
+
+export default function RequestServiceModal({
+  isOpen,
+  onClose,
+  prefill = {},
+  endpoint: endpointProp, // ممكن تمرّره من الأب؛ لو مش موجود هنقرأ من env
+}) {
   const toast = useToast();
   const { pathname } = useLocation();
   const isEn = pathname.startsWith("/en");
 
-  const [form, setForm] = useState({
-    name: "", phone: "", city: "",
-    brand: prefill.brand || "", device: prefill.device || "",
-    issue: "", lang: isEn ? "en" : "ar", page: pathname,
-    hp: "" // honeypot
+  // endpoint من الـ prop أو من env (مع trim)
+  const endpoint = String(endpointProp ?? import.meta.env.VITE_GAS_ENDPOINT ?? "").trim();
+
+  // اسم العميل لرسالة التأكيد
+  const [submittedName, setSubmittedName] = useState("");
+
+  const { t, form, errors, step, loading, onChange, handleNext, submit, resetForm, setStep } = useRequestForm({
+    isEn,
+    prefill,
+    endpoint,
+    onSuccess: (_status, tt, ctx) => {
+      setSubmittedName((ctx?.form?.name ?? form.name) || "");
+      setStep(3);
+      toast({ status: "success", title: tt.sentOk });
+    },
+    onError: (e, tt) => {
+      const map = { INVALID_RESPONSE: tt.serverInvalid, SERVER_ERROR: tt.serverError };
+      toast({ status: "error", title: map[e.message] || e.message || tt.serverError });
+    },
   });
-  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    setForm(f => ({
-      ...f,
-      brand: prefill.brand || "",
-      device: prefill.device || "",
-      lang: isEn ? "en" : "ar",
-      page: pathname
-    }));
-  }, [prefill, isEn, pathname]);
-
-  const t = isEn ? {
-    title: "Book Service",
-    save: "Send request",
-    cancel: "Close",
-    fields: {
-      name: "Full name",
-      phone: "Phone",
-      city: "City",
-      brand: "Brand",
-      device: "Device",
-      issue: "Describe the issue"
-    }
-  } : {
-    title: "حجز صيانة",
-    save: "إرسال الطلب",
-    cancel: "إغلاق",
-    fields: {
-      name: "الاسم بالكامل",
-      phone: "رقم الهاتف",
-      city: "المدينة",
-      brand: "العلامة التجارية",
-      device: "نوع الجهاز",
-      issue: "وصف المشكلة"
-    }
+  const closeAll = () => {
+    onClose?.();
+    resetForm();
+    setSubmittedName("");
   };
 
-  const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
-
-  const submit = async () => {
-    // فالييديشن بسيطة
-    if (!form.name || !form.phone) {
-      toast({ status: "warning", title: isEn ? "Name & phone are required." : "الاسم ورقم الهاتف إلزاميان." });
-      return;
-    }
-    setLoading(true);
-    try {
-      // لتجنب CORS preflight هنستخدم x-www-form-urlencoded
-      const body = new URLSearchParams(form); // hp = honeypot
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
-        body
-      });
-      // مش مهم نقرأ الرد — هنعرض نجاح لِطّيف
-      toast({ status: "success", title: isEn ? "Sent successfully." : "تم الإرسال بنجاح." });
-      onClose();
-      setForm(f => ({ ...f, name: "", phone: "", city: "", issue: "" }));
-    } catch (e) {
-      console.error(e);
-      toast({ status: "error", title: isEn ? "Something went wrong." : "حدث خطأ أثناء الإرسال." });
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Guard: لو الـ endpoint مش مُعرّف
+  if (!endpoint) {
+    return (
+      <Modal isOpen={isOpen} onClose={onClose} isCentered size="lg">
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>{isEn ? "Configuration error" : "خطأ إعدادات"}</ModalHeader>
+          <ModalBody>
+            <Text>{isEn ? "Missing GAS endpoint." : "قيمة GAS endpoint غير مُعرّفة."}</Text>
+          </ModalBody>
+          <ModalFooter>
+            <Button onClick={onClose}>{isEn ? "Close" : "إغلاق"}</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    );
+  }
 
   return (
-    <Modal isOpen={isOpen} onClose={loading ? () => {} : onClose} isCentered>
-      <ModalOverlay />
-<ModalContent dir={isEn ? "ltr" : "rtl"}>
-  <ModalHeader textAlign={isEn ? "left" : "right"}>{t.title}</ModalHeader>
-  <ModalBody style={{ textAlign: isEn ? "left" : "right" }}>
-    {/* Honeypot hidden field */}
-    <Input name="hp" value={form.hp} onChange={onChange} display="none" />
+    <Modal isOpen={isOpen} onClose={loading ? () => {} : closeAll} isCentered size="lg">
+      <ModalOverlay bg="blackAlpha.500" backdropFilter="blur(3px)" />
+      <ModalContent dir={isEn ? "ltr" : "rtl"} borderRadius="2xl" boxShadow="xl">
+        <ModalHeader textAlign={isEn ? "left" : "right"}>
+          <Text fontSize="xl" fontWeight="extrabold">
+            {t.title}
+          </Text>
+          {step < 3 && (
+            <Box mt={3}>
+              <HStack justify="space-between">
+                <StepBadge idx={1} label={t.steps[0]} active={step === 1} />
+                <StepBadge idx={2} label={t.steps[1]} active={step === 2} />
+              </HStack>
+            </Box>
+          )}
+        </ModalHeader>
 
-    <HStack spacing={4} flexDir={isEn ? "row" : "row-reverse"}>
-      <FormControl isRequired>
-        <FormLabel>{t.fields.phone}</FormLabel>
-        <Input name="phone" value={form.phone} onChange={onChange} textAlign={isEn ? "left" : "right"} />
-      </FormControl>
-      <FormControl isRequired>
-        <FormLabel>{t.fields.name}</FormLabel>
-        <Input name="name" value={form.name} onChange={onChange} textAlign={isEn ? "left" : "right"} />
-      </FormControl>
-    </HStack>
+        {step < 3 && <Progress value={(step / 2) * 100} size="xs" colorScheme="blue" borderRadius="full" mx={6} />}
 
-    <HStack spacing={4} mt={4} flexDir={isEn ? "row" : "row-reverse"}>
-      <FormControl>
-        <FormLabel>{t.fields.city}</FormLabel>
-        <Input name="city" value={form.city} onChange={onChange} textAlign={isEn ? "left" : "right"} />
-      </FormControl>
-      <FormControl>
-        <FormLabel>{t.fields.brand}</FormLabel>
-        <Input name="brand" value={form.brand} onChange={onChange} textAlign={isEn ? "left" : "right"} />
-      </FormControl>
-    </HStack>
+        <ModalBody px={6} py={4}>
+          {/* honeypot */}
+          <Input name="hp" value={form.hp} onChange={onChange} display="none" />
 
-    <FormControl mt={4}>
-      <FormLabel>{t.fields.device}</FormLabel>
-      <Select
-        name="device"
-        value={form.device}
-        onChange={onChange}
-        textAlign={isEn ? "left" : "right"}
-      >
-        <option value="">{isEn ? "Select…" : "اختر…"}</option>
-        <option value="Refrigerator">{isEn ? "Refrigerator" : "ثلاجة"}</option>
-        <option value="Washer">{isEn ? "Washing Machine" : "غسالة"}</option>
-        <option value="Oven">{isEn ? "Cooker/Oven" : "بوتاجاز/فرن"}</option>
-        <option value="Microwave">{isEn ? "Microwave" : "ميكروويف"}</option>
-        <option value="AC">{isEn ? "Air Conditioner" : "تكييف"}</option>
-        <option value="Heater">{isEn ? "Water Heater" : "سخان"}</option>
-        <option value="Freezer">{isEn ? "Deep Freezer" : "ديب فريزر"}</option>
-      </Select>
-    </FormControl>
+          {step === 1 && <StepApplianceIssue t={t} isEn={isEn} form={form} errors={errors} onChange={onChange} />}
 
-    <FormControl mt={4}>
-      <FormLabel>{t.fields.issue}</FormLabel>
-      <Textarea
-        name="issue"
-        value={form.issue}
-        onChange={onChange}
-        rows={4}
-        textAlign={isEn ? "left" : "right"}
-      />
-    </FormControl>
-  </ModalBody>
-  <ModalFooter>
-    <Button mr={3} variant="ghost" onClick={onClose} isDisabled={loading}>
-      {t.cancel}
-    </Button>
-    <Button colorScheme="blue" onClick={submit} isLoading={loading}>
-      {t.save}
-    </Button>
-  </ModalFooter>
-</ModalContent>
+          {step === 2 && <StepContactLocation t={t} isEn={isEn} form={form} errors={errors} onChange={onChange} />}
 
+          {step === 3 && <StepConfirm name={submittedName} isEn={isEn} onClose={closeAll} />}
+        </ModalBody>
+
+        {step < 3 && (
+          <ModalFooter
+            bg="blackAlpha.50"
+            _dark={{ bg: "whiteAlpha.100" }}
+            borderTopWidth="1px"
+            borderBottomRadius="2xl"
+            justifyContent="center" // ← توسيط الأزرار
+            flexWrap="wrap" // ← لو المساحة ضاقت تنزل سطر تاني
+            gap={3} // ← مسافات متساوية بين الأزرار
+          >
+            {step > 1 && (
+              <Button variant="ghost" onClick={() => setStep(step - 1)}>
+                {t.back}
+              </Button>
+            )}
+
+            {step < 2 && (
+              <Button colorScheme="blue" onClick={handleNext}>
+                {t.next}
+              </Button>
+            )}
+
+            {step === 2 && (
+              <Button colorScheme="blue" onClick={submit} isLoading={loading}>
+                {t.save}
+              </Button>
+            )}
+
+            <Button variant="ghost" onClick={closeAll}>
+              {t.cancel}
+            </Button>
+          </ModalFooter>
+        )}
+      </ModalContent>
     </Modal>
   );
 }
