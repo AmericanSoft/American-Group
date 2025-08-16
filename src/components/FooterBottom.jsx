@@ -14,7 +14,7 @@ export default function FooterBottom({
   logos = DEFAULT_LOGOS,
   gap = 64,          // px
   logoH = 70,        // px
-  duration = 10,     // seconds
+  duration = 4,     // seconds
   px = 0,
   py = 4,
   softEdges = false, // gradient mask on edges

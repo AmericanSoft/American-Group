@@ -139,11 +139,14 @@ export default function Footer({
 
   const policiesPath = `${prefix}/policies`;
   const handlePoliciesClick = (e) => {
-    if (location.pathname === policiesPath) {
-      e.preventDefault();
-      window.history.replaceState(null, "", policiesPath);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+    if (location.pathname !== policiesPath) {
+      navigate(policiesPath);
     }
+
+    // نخليها تطلع فوق بعد التنقل أو لو انت بالفعل في صفحة السياسات
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }, 0);
   };
 
   return (

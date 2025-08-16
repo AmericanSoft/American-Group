@@ -62,13 +62,14 @@ export default function Header() {
       to={to}
       onClick={onClick}
       end={to === `${prefix}/`}
-      _activeLink={{ bg: "blue.700", color: "white" }}
+      // _activeLink={{ bg: "blue.700", color: "white" }}
       px={4}
       py={3}
       borderRadius="lg"
       fontWeight="700"
       display="flex"
       alignItems="center"
+      justifyContent={"center"}
       gap={3}
       _hover={{ bg: "blue.50", color: "blue.700" }}
     >
@@ -240,15 +241,15 @@ export default function Header() {
                 {labels.home}
               </NavItem>
 
-              <NavItem to={`${prefix}/services`} icon={<FaTools />} onClick={onClose}>
+              <NavItem to={`${prefix}/#services-section`} icon={<FaTools />} onClick={onClose}>
                 {labels.services}
               </NavItem>
 
-              <NavItem to={`${prefix}/contact`} icon={<FaPhoneAlt />} onClick={onClose}>
+              <NavItem to={`${prefix}/#contact-section`} icon={<FaPhoneAlt />} onClick={onClose}>
                 {labels.contact}
               </NavItem>
 
-              <NavItem to={`${prefix}/politics`} icon={<FaShieldAlt />} onClick={onClose}>
+              <NavItem to={`${prefix}/policies`} icon={<FaShieldAlt />} onClick={onClose}>
                 {labels.policies}
               </NavItem>
 
